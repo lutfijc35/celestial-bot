@@ -611,13 +611,138 @@
     }
 
     .step-line.done { background: #3ba55d; }
+
+    /* ── Hamburger Button (mobile only) ── */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: #b9bbbe;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+    }
+
+    /* ── Sidebar overlay (mobile) ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 99;
+    }
+
+    /* ══════════════════════════════
+       MOBILE RESPONSIVE — max 600px
+    ══════════════════════════════ */
+    @media (max-width: 600px) {
+
+      /* Sidebar — slide in/out */
+      .sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        width: 220px;
+      }
+
+      .sidebar.open { transform: translateX(0); }
+
+      .sidebar-overlay.open { display: block; }
+
+      /* Hamburger visible */
+      .hamburger { display: block; }
+
+      /* Channel header adjustments */
+      .channel-header {
+        padding: 0 10px;
+        gap: 6px;
+        font-size: 13px;
+      }
+
+      /* Tab nav — smaller text */
+      .tab {
+        padding: 10px 10px;
+        font-size: 12px;
+      }
+
+      /* Messages padding */
+      .message-group,
+      .message { padding-left: 10px; padding-right: 10px; }
+
+      /* Avatar smaller on mobile */
+      .avatar { width: 36px; height: 36px; font-size: 14px; }
+      .avatar-spacer { width: 36px; }
+      .message-group,
+      .message { gap: 10px; }
+
+      /* Embeds — full width */
+      .embed,
+      .cta-embed,
+      .guild-card { max-width: 100% !important; }
+
+      /* embed-fields: force single column */
+      .embed-fields.col2,
+      .embed-fields.col3 { grid-template-columns: 1fr !important; }
+
+      /* Modal — full width, less padding */
+      .modal-wrap { padding: 8px; }
+      .modal-overlay {
+        padding: 16px;
+        border-radius: 6px;
+      }
+      .modal-title { font-size: 17px; }
+      .form-input, .form-select { font-size: 16px; } /* prevent zoom on iOS */
+
+      /* Step indicator — compact */
+      .step-dot {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+      }
+      .step-line { max-width: 28px; }
+
+      /* Button row — stack */
+      .button-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .button-row .btn { width: 100%; justify-content: center; }
+
+      /* Modal buttons — stack */
+      .modal-buttons {
+        flex-direction: column-reverse;
+        gap: 8px;
+      }
+      .modal-buttons .btn { width: 100%; justify-content: center; }
+
+      /* Role select wrap */
+      .role-select-row { flex-direction: column; }
+
+      /* Preview section label */
+      .preview-section { font-size: 9px; }
+
+      /* Guild meta — wrap */
+      .guild-meta { flex-wrap: wrap; gap: 8px; }
+
+      /* CTA info — wrap */
+      .cta-info { flex-direction: column; gap: 6px; }
+
+      /* Profile row — narrower key */
+      .profile-row { grid-template-columns: 68px 1fr; }
+
+      /* Tab nav step label — hide on tiny screens */
+      #step-label { display: none; }
+    }
   </style>
 </head>
 <body>
 <div class="app">
 
+  <!-- Sidebar overlay (mobile tap-to-close) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
   <!-- ══ Sidebar ══ -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="server-header">🌌 Celestial Server</div>
 
     <div class="channel-category">Public</div>
@@ -636,6 +761,7 @@
 
     <!-- Channel Header -->
     <div class="channel-header" id="channel-label">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
       <span class="hash">#</span>
       <span id="channel-name">register-here</span>
     </div>
@@ -1423,11 +1549,19 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
   // Init
   showRegStep(1);
 
+  // Sidebar toggle (mobile)
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebar-overlay').classList.toggle('open');
+  }
+
   // Sidebar channel click
   document.querySelectorAll('.channel').forEach(ch => {
     ch.addEventListener('click', () => {
       document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
       ch.classList.add('active');
+      // Auto-close sidebar on mobile after channel click
+      if (window.innerWidth <= 600) toggleSidebar();
     });
   });
 </script>

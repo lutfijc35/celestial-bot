@@ -13,7 +13,7 @@ Menyimpan semua akun game yang sudah didaftarkan user.
 CREATE TABLE IF NOT EXISTS accounts (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     discord_id  TEXT    NOT NULL,               -- Discord user ID
-    nickname    TEXT    NOT NULL UNIQUE,         -- Nickname in-game (unik global)
+    nickname    TEXT    NOT NULL,                -- Nickname in-game (unik per server)
     guild       TEXT    NOT NULL,               -- Nama guild
     server      TEXT    NOT NULL,               -- Region/server (contoh: Asia)
     game        TEXT    NOT NULL,               -- Nama game (contoh: E7)
@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+UNIQUE(nickname, server)  -- nickname harus unik per server, boleh sama di server berbeda
 
 CREATE INDEX IF NOT EXISTS idx_accounts_discord_id ON accounts(discord_id);
 CREATE INDEX IF NOT EXISTS idx_accounts_guild      ON accounts(guild);
@@ -122,9 +124,9 @@ WHERE discord_id = ?
 ORDER BY created_at ASC;
 ```
 
-### Cek nickname sudah ada
+### Cek nickname sudah ada (per server)
 ```sql
-SELECT id FROM accounts WHERE nickname = ? LIMIT 1;
+SELECT id FROM accounts WHERE nickname = ? AND server = ? LIMIT 1;
 ```
 
 ### Ambil semua member per guild (untuk guild list)

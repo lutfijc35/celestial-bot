@@ -17,10 +17,10 @@ Celestial adalah Discord bot untuk manajemen guild game dan auto role-assignment
   |---|---|---|---|
   | Server | Text | ✅ | Region server (contoh: Asia, NA, EU, KR) |
   | Guild | Text | ❌ | Nama guild (opsional, kosongkan jika belum punya guild) |
-  | Nickname | Text | ✅ | Nickname in-game, harus unik di seluruh database |
+  | Nickname | Text | ✅ | Nickname in-game, harus unik per server (kombinasi Nickname+Server tidak boleh sama) |
 - **Catatan:** Game saat ini default Epic Seven (E7). Field Game tidak ditampilkan di modal.
 - **Validasi:**
-  - Nickname yang sudah ada di database → ditolak dengan pesan error
+  - Kombinasi Nickname + Server yang sudah ada → ditolak dengan pesan error
 - **Setelah submit:**
   - `APPROVAL_MODE=manual` → status `pending`, bot kirim ke `#approval-request`
 

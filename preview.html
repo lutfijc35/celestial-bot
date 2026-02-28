@@ -612,6 +612,162 @@
 
     .step-line.done { background: #3ba55d; }
 
+    /* ── Welcome & Rules ── */
+    .embed-author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .embed-author-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .embed-author-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f2f3f5;
+    }
+
+    .embed-title-large {
+      font-size: 16px;
+      font-weight: 800;
+      color: #f2f3f5;
+      margin-bottom: 4px;
+      letter-spacing: 0.01em;
+    }
+
+    .embed-subtitle {
+      font-size: 13px;
+      color: #949ba4;
+      font-style: italic;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .rules-divider {
+      border: none;
+      border-top: 1px solid #3f4147;
+      margin: 12px 0;
+    }
+
+    .rules-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f2f3f5;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+
+    .rules-item {
+      font-size: 13px;
+      color: #b9bbbe;
+      line-height: 1.55;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 4px;
+    }
+
+    .rules-item strong {
+      color: #dcddde;
+    }
+
+    .rules-cta {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid #3f4147;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 4px;
+    }
+
+    .rules-cta-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f2f3f5;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .rules-cta-subtitle {
+      font-size: 12px;
+      color: #949ba4;
+      margin-bottom: 6px;
+    }
+
+    .rules-cta-channels {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .rules-cta-channel {
+      font-size: 13px;
+      color: #b9bbbe;
+    }
+
+    .embed-with-thumbnail {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .embed-body { flex: 1; min-width: 0; }
+
+    .embed-thumb-circle {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5865f2, #9b59b6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .reaction {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 14px;
+      color: #b9bbbe;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+      margin-top: 8px;
+    }
+
+    .reaction:hover { background: rgba(255,255,255,0.1); }
+
+    .reaction.active {
+      background: rgba(88,101,242,0.2);
+      border-color: rgba(88,101,242,0.5);
+      color: #8ea1e1;
+    }
+
     /* ── Hamburger Button (mobile only) ── */
     .hamburger {
       display: none;
@@ -732,6 +888,13 @@
 
       /* Tab nav step label — hide on tiny screens */
       #step-label { display: none; }
+
+      /* Rules thumbnail — smaller on mobile */
+      .embed-thumb-circle { width: 44px; height: 44px; font-size: 20px; }
+
+      /* embed-with-thumbnail — thumbnail below on very small */
+      .embed-with-thumbnail { flex-direction: column-reverse; gap: 8px; }
+      .embed-thumb-circle { align-self: flex-start; }
     }
   </style>
 </head>
@@ -746,6 +909,8 @@
     <div class="server-header">🌌 Celestial Server</div>
 
     <div class="channel-category">Public</div>
+    <div class="channel" onclick="showTab('welcome')"><span class="hash">#</span> welcome</div>
+    <div class="channel" onclick="showTab('rules')"><span class="hash">#</span> rules</div>
     <div class="channel"><span class="hash">#</span> general</div>
     <div class="channel active"><span class="hash">#</span> register-here</div>
     <div class="channel"><span class="hash">#</span> tampil-profile</div>
@@ -774,6 +939,8 @@
       <div class="tab"           onclick="showTab('tampil-profile')"  ># tampil-profile</div>
       <div class="tab"           onclick="showTab('profile-cmd')"     >/profile</div>
       <div class="tab"           onclick="showTab('guild-list')"      ># guild-list</div>
+      <div class="tab"           onclick="showTab('welcome')"         ># welcome</div>
+      <div class="tab"           onclick="showTab('rules')"           ># rules</div>
     </div>
 
     <!-- ══════════════════════════════════════════════ -->
@@ -1375,6 +1542,114 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
 
       </div>
 
+      <!-- ─── TAB: #welcome ─── -->
+      <div class="panel" id="tab-welcome">
+
+        <div class="preview-section">Bot kirim otomatis setiap kali member baru join server (on_member_join)</div>
+
+        <!-- Welcome #1 -->
+        <div class="message-group">
+          <div class="avatar bot">✦</div>
+          <div class="message-content">
+            <div class="message-header">
+              <span class="username bot-name">Celestial</span>
+              <span class="bot-badge">BOT</span>
+              <span class="timestamp">Hari ini pukul 09:14</span>
+            </div>
+            <div class="embed info">
+              <div class="embed-author">
+                <div class="embed-author-avatar" style="background:#ed4245">S</div>
+                <div class="embed-author-name">sonnychibi7</div>
+              </div>
+              <div class="embed-title">👋 Selamat datang, <span class="mention">@sonnychibi7</span>!</div>
+              <div class="embed-description" style="margin-top:8px">
+                Halo <span class="mention">@sonnychibi7</span>! Selamat bergabung di <strong>Celestial Server</strong>.<br><br>
+                📖 Baca peraturan di <span class="mention">#rules</span> terlebih dahulu.
+              </div>
+              <div class="embed-footer">✦ Celestial · Selamat bergabung!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="msg-divider"><span>Beberapa waktu kemudian — member lain join</span></div>
+
+        <!-- Welcome #2 -->
+        <div class="message-group">
+          <div class="avatar bot">✦</div>
+          <div class="message-content">
+            <div class="message-header">
+              <span class="username bot-name">Celestial</span>
+              <span class="bot-badge">BOT</span>
+              <span class="timestamp">Hari ini pukul 14:37</span>
+            </div>
+            <div class="embed info">
+              <div class="embed-author">
+                <div class="embed-author-avatar" style="background:#3ba55d">P</div>
+                <div class="embed-author-name">Plattt</div>
+              </div>
+              <div class="embed-title">👋 Selamat datang, <span class="mention">@Plattt</span>!</div>
+              <div class="embed-description" style="margin-top:8px">
+                Halo <span class="mention">@Plattt</span>! Selamat bergabung di <strong>Celestial Server</strong>.<br><br>
+                📖 Baca peraturan di <span class="mention">#rules</span> terlebih dahulu.
+              </div>
+              <div class="embed-footer">✦ Celestial · Selamat bergabung!</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── TAB: #rules ─── -->
+      <div class="panel" id="tab-rules">
+
+        <div class="preview-section">Pesan di-post sekali oleh admin via /setup-rules · read-only channel</div>
+
+        <div class="message-group">
+          <div class="avatar bot">✦</div>
+          <div class="message-content">
+            <div class="message-header">
+              <span class="username bot-name">Celestial</span>
+              <span class="bot-badge">BOT</span>
+              <span class="timestamp">Hari ini pukul 00:00</span>
+              <span style="font-size:11px;color:#72767d;margin-left:6px">📌 disematkan</span>
+            </div>
+            <div class="embed warning">
+              <div class="embed-with-thumbnail">
+                <div class="embed-body">
+                  <div class="embed-title-large">🌌 SELAMAT DATANG DI CELESTIALS SERVER!</div>
+                  <div class="embed-subtitle">Sebelum menjelajahi channel lain, tolong Baca, Patuhi &amp; Pahami Rules di sini.</div>
+                  <hr class="rules-divider">
+                  <div class="rules-section-label">RULES</div>
+                  <div class="rules-list">
+                    <div class="rules-item"><strong>1.</strong> 🚫 NO DRAMA! Jangan bawa-bawa masalah pribadi ke server.</div>
+                    <div class="rules-item"><strong>2.</strong> 🗣️ Biasakan berbahasa yang baik. Toxic boleh tapi jangan keterlaluan. Dan gak boleh baperan juga kalo di-toxic-in balik.</div>
+                    <div class="rules-item"><strong>3.</strong> 📌 Gunakan channel sesuai nama dan sebagaimana mestinya.</div>
+                    <div class="rules-item"><strong>4.</strong> 🖼️ Kirim foto/video sewajarnya (share pict SFW channel). Nude tidak apa-apa asal jangan berlebihan/porn*. Untuk channel YTTA udah ada, dosa ditanggung masing-masing.</div>
+                    <div class="rules-item"><strong>5.</strong> 🌍 Jangan rasis (kalo anime... tau sendiri lah). Hindari isu SARA dan segala bentuk ujaran kebencian.</div>
+                    <div class="rules-item"><strong>6.</strong> 🔇 Jangan rusuh / chat spam! Kalo ada akun yang ke-hack ngirim spam = kick.</div>
+                  </div>
+                  <div class="embed-footer">✦ Celestial · Pelanggaran → kick/ban</div>
+                  <hr class="rules-divider">
+                  <div class="rules-cta">
+                    <div class="rules-cta-title">Jika sudah membaca dan setuju dengan rules di atas, react ✅ pada pesan ini.</div>
+                    <div class="rules-cta-subtitle">Setelah react, channel berikut akan terbuka:</div>
+                    <div class="rules-cta-channels">
+                      <div class="rules-cta-channel">🎮 <span class="mention">#register-here</span> — Daftarkan akun Epic Seven kamu</div>
+                      <div class="rules-cta-channel">🎭 <span class="mention">#pilih-roles</span> — Ambil role selain Epic Seven</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="embed-thumb-circle">✦</div>
+              </div>
+              <div>
+                <span class="reaction active" onclick="toggleReaction(this)">✅ <span class="react-count">1</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div><!-- /panels -->
   </div><!-- /main -->
 </div><!-- /app -->
@@ -1387,6 +1662,8 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
     'tampil-profile' : 'tampil-profile',
     'profile-cmd'    : 'general — /profile',
     'guild-list'     : 'guild-list',
+    'welcome'        : 'welcome',
+    'rules'          : 'rules',
   };
 
   function showTab(id) {
@@ -1397,7 +1674,7 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
     if (panel) panel.classList.add('active');
 
     const tabs = document.querySelectorAll('.tab');
-    const tabMap = ['register-here','modal','approval','tampil-profile','profile-cmd','guild-list'];
+    const tabMap = ['register-here','modal','approval','tampil-profile','profile-cmd','guild-list','welcome','rules'];
     const idx = tabMap.indexOf(id);
     if (idx >= 0) tabs[idx].classList.add('active');
 
@@ -1553,6 +1830,14 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
   function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('sidebar-overlay').classList.toggle('open');
+  }
+
+  function toggleReaction(el) {
+    const countEl = el.querySelector('.react-count');
+    const isActive = el.classList.toggle('active');
+    countEl.textContent = isActive
+      ? parseInt(countEl.textContent) + 1
+      : Math.max(0, parseInt(countEl.textContent) - 1);
   }
 
   // Sidebar channel click

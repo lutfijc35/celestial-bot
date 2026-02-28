@@ -206,3 +206,65 @@ Total guild: 2 · Total member: 5
 | Admin `/guild-set-info` | ✅ Ya |
 | Admin `/guild-info` | ✅ Ya (force refresh) |
 | User `/edit` (re-approved) | ✅ Ya |
+
+---
+
+## Welcome Message
+
+### Trigger
+Event: `on_member_join(member)` — otomatis dipanggil setiap kali member baru join server.
+
+### Channel
+`WELCOME_CHANNEL_ID` — dikonfigurasi via `.env`.
+
+### Embed
+```
+Author : avatar + username member baru
+Title  : 👋 Selamat datang, @username!
+Body   : Mention user + teks selamat datang + instruksi baca #rules
+Footer : ✦ Celestial · Selamat bergabung!
+Color  : Biru (info)
+```
+
+---
+
+## Rules Channel
+
+### Setup
+Admin jalankan `/setup-rules` → bot post embed rules ke `#rules` channel (satu kali, pesan disematkan).
+
+### Embed
+```
+Title     : 🌌 SELAMAT DATANG DI CELESTIALS SERVER!
+Subtitle  : Sebelum menjelajahi channel lain, tolong Baca, Patuhi & Pahami Rules di sini.
+Rules     : 6 poin rules server (lihat konten aktual)
+Footer    : ✦ Celestial · Pelanggaran → kick/ban
+CTA bawah : React ✅ → channel #register-here & #pilih-roles terbuka
+Color     : Kuning/warning
+Thumbnail : Logo Celestial (lingkaran dengan ✦)
+```
+
+### Channel Lock / Unlock via Reaction
+```
+User react ✅ pada pesan rules
+    │
+    ▼
+on_raw_reaction_add(payload)
+    │
+    ▼
+Bot assign role "Member" ke user
+    │
+    ▼
+Channel #register-here & #pilih-roles unlock
+(permission Discord: hanya visible untuk role "Member")
+```
+
+**Catatan setup manual di Discord:**
+1. Buat role `Member`
+2. Set permission `#register-here` dan `#pilih-roles` → hanya visible ke role `Member`
+3. Channel mention di embed menggunakan `<#CHANNEL_ID>` (dikonfigurasi via env var)
+
+### Channel Mentions di Embed
+- `REGISTER_CHANNEL_ID` → `<#channel_id>` di teks rules
+- `PILIH_ROLES_CHANNEL_ID` → `<#channel_id>` di teks rules
+

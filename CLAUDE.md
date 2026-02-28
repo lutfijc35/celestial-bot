@@ -58,6 +58,14 @@ celestial/
 | `/set-guild <guild> <@role>` | Mapping nama guild ke Discord role |
 | `/guild-set-info <guild> <level> <tipe> <keterangan>` | Set info guild (level angka, tipe: casual/semi_compe/compe) |
 | `/guild-info` | Force refresh pesan guild list di channel guild-list |
+| `/setup-rules` | Admin | Post embed rules ke #rules channel (satu kali) |
+
+## Events (Bot Listeners)
+
+| Event | Deskripsi |
+|---|---|
+| `on_member_join` | Bot kirim embed welcome ke `#welcome` channel secara otomatis |
+| `on_raw_reaction_add` | Deteksi react ✅ di pesan rules → assign role `Member` → unlock #register-here & #pilih-roles |
 
 ## Role Assignment Logic
 
@@ -96,6 +104,11 @@ DISCORD_TOKEN=your_bot_token
 GUILD_ID=your_server_id
 APPROVAL_CHANNEL_ID=channel_id_for_approval
 GUILD_LIST_CHANNEL_ID=channel_id_for_guild_list
+WELCOME_CHANNEL_ID=channel_id_for_welcome
+RULES_MESSAGE_ID=message_id_of_rules_post
+REGISTER_CHANNEL_ID=channel_id_for_register_here
+PILIH_ROLES_CHANNEL_ID=channel_id_for_pilih_roles
+MEMBER_ROLE_ID=role_id_assigned_after_rules_react
 APPROVAL_MODE=manual   # manual | auto
 DB_PATH=data/celestial.db
 ```

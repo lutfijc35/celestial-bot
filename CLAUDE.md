@@ -45,7 +45,7 @@ celestial/
 
 | Command | Deskripsi |
 |---|---|
-| `/register` | Buka modal form untuk mendaftarkan 1 akun game (Nickname, Guild, Server, Game) |
+| `/register` | Buka modal 1 langkah: Server (wajib), Guild (opsional), Nickname (wajib). Game default E7. |
 | `/unregister` | Hapus akun yang sudah terdaftar (pilih dari list jika > 1 akun) |
 | `/edit` | Edit semua field akun yang sudah ada |
 | `/profile` | Lihat profil akun sendiri |

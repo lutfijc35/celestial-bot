@@ -962,13 +962,12 @@
             <div class="cta-embed">
               <div class="cta-title">✦ Daftarkan Akun Game Kamu</div>
               <div class="cta-desc">
-                Belum terdaftar? Daftarkan akun game kamu sekarang dan dapatkan role guild otomatis di server ini.<br><br>
+                Belum terdaftar? Daftarkan akun game kamu sekarang.<br><br>
                 Klik tombol di bawah untuk membuka form pendaftaran.
               </div>
               <div class="cta-info">
                 <div class="cta-info-item">📋 Isi form singkat</div>
                 <div class="cta-info-item">✅ Tunggu persetujuan admin</div>
-                <div class="cta-info-item">🎭 Role otomatis di-assign</div>
               </div>
               <div class="button-row">
                 <button class="btn btn-primary" onclick="showTab('modal')">📝 Daftar Sekarang</button>
@@ -981,137 +980,42 @@
 
       </div>
 
-      <!-- ─── TAB 2: Multi-step Register ─── -->
+      <!-- ─── TAB 2: Modal /register ─── -->
       <div class="panel" id="tab-modal">
 
-        <!-- Step indicator -->
-        <div style="padding: 12px 16px 0;">
-          <div style="display:flex; align-items:center; gap:8px; max-width:520px;">
-            <div class="step-dot active" id="dot-1">1</div>
-            <div class="step-line" id="line-1"></div>
-            <div class="step-dot" id="dot-2">2</div>
-            <div class="step-line" id="line-2"></div>
-            <div class="step-dot" id="dot-3">3</div>
-            <div class="step-line" id="line-3"></div>
-            <div class="step-dot" id="dot-4">4</div>
-            <div style="font-size:12px; color:#72767d; margin-left:8px;" id="step-label">Pilih Game</div>
-          </div>
-        </div>
-
-        <!-- ── STEP 1: Pilih Game ── -->
-        <div id="reg-step-1">
-          <div class="preview-section">Step 1 — Bot kirim pesan ephemeral: pilih Game</div>
-          <div class="message-group">
-            <div class="avatar bot">✦</div>
-            <div class="message-content">
-              <div class="message-header">
-                <span class="username bot-name">Celestial</span>
-                <span class="bot-badge">BOT</span>
-                <span class="timestamp">Hari ini pukul 23:38</span>
-                <span style="font-size:11px; color:#faa61a; background:#faa61a22; padding:1px 6px; border-radius:3px; font-weight:600;">Hanya kamu yang bisa lihat ini</span>
-              </div>
-              <div class="embed info" style="max-width:420px">
-                <div class="embed-title">✦ Daftarkan Akun — Step 1 dari 3</div>
-                <div class="embed-description">Pilih game yang ingin kamu daftarkan.</div>
-                <div class="form-group" style="margin-top:10px; margin-bottom:0">
-                  <select class="form-select" id="game-select" onchange="onGameChange(this.value)" style="max-width:300px">
-                    <option value="">— Pilih Game —</option>
-                    <option value="e7">Epic Seven (E7)</option>
-                    <option value="roblox">Roblox</option>
-                    <option value="other">Game Lainnya</option>
-                  </select>
-                </div>
-                <div class="button-row" style="margin-top:12px">
-                  <button class="btn btn-primary" onclick="regNextStep(1)" id="btn-step1" disabled>Lanjut →</button>
-                  <button class="btn btn-secondary">Batal</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── STEP 2: Pilih Server ── -->
-        <div id="reg-step-2" style="display:none">
-          <div class="preview-section">Step 2 — Bot update pesan: pilih Server</div>
-          <div class="message-group">
-            <div class="avatar bot">✦</div>
-            <div class="message-content">
-              <div class="message-header">
-                <span class="username bot-name">Celestial</span>
-                <span class="bot-badge">BOT</span>
-                <span class="timestamp">Hari ini pukul 23:38 <span class="edited-tag">(diedit)</span></span>
-                <span style="font-size:11px; color:#faa61a; background:#faa61a22; padding:1px 6px; border-radius:3px; font-weight:600;">Hanya kamu yang bisa lihat ini</span>
-              </div>
-              <div class="embed info" style="max-width:420px">
-                <div class="embed-title">✦ Daftarkan Akun — Step 2 dari 3</div>
-                <div style="font-size:13px; color:#72767d; margin-bottom:10px;">
-                  Game: <span id="s2-game" style="color:#dcddde; font-weight:600;"></span>
-                </div>
-                <div class="embed-description">Pilih server game kamu.</div>
-                <div class="form-group" style="margin-top:10px; margin-bottom:0">
-                  <select class="form-select" id="server-select" style="max-width:300px">
-                    <option value="">— Pilih Server —</option>
-                  </select>
-                </div>
-                <div class="button-row" style="margin-top:12px">
-                  <button class="btn btn-primary" onclick="regNextStep(2)" id="btn-step2">Lanjut →</button>
-                  <button class="btn btn-secondary" onclick="regBackStep(2)">← Kembali</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── STEP 3: Pilih Guild (hanya game dengan guild) ── -->
-        <div id="reg-step-3" style="display:none">
-          <div class="preview-section">Step 3 — Bot update pesan: pilih Guild (hanya untuk game yang punya guild)</div>
-          <div class="message-group">
-            <div class="avatar bot">✦</div>
-            <div class="message-content">
-              <div class="message-header">
-                <span class="username bot-name">Celestial</span>
-                <span class="bot-badge">BOT</span>
-                <span class="timestamp">Hari ini pukul 23:38 <span class="edited-tag">(diedit)</span></span>
-                <span style="font-size:11px; color:#faa61a; background:#faa61a22; padding:1px 6px; border-radius:3px; font-weight:600;">Hanya kamu yang bisa lihat ini</span>
-              </div>
-              <div class="embed info" style="max-width:420px">
-                <div class="embed-title">✦ Daftarkan Akun — Step 3 dari 3</div>
-                <div style="font-size:13px; color:#72767d; margin-bottom:10px;">
-                  Game: <span id="s3-game" style="color:#dcddde; font-weight:600;"></span> &nbsp;·&nbsp;
-                  Server: <span id="s3-server" style="color:#dcddde; font-weight:600;"></span>
-                </div>
-                <div class="embed-description">Pilih guild kamu.</div>
-                <div class="form-group" style="margin-top:10px; margin-bottom:0">
-                  <select class="form-select" id="guild-select" style="max-width:300px">
-                    <option value="">— Pilih Guild —</option>
-                    <option value="amateurs">amateurs</option>
-                    <option value="virtue">virtue</option>
-                    <option value="octagram">Octagram</option>
-                  </select>
-                </div>
-                <div class="button-row" style="margin-top:12px">
-                  <button class="btn btn-primary" onclick="regNextStep(3)" id="btn-step3">Lanjut →</button>
-                  <button class="btn btn-secondary" onclick="regBackStep(3)">← Kembali</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── STEP 4: Modal Nickname ── -->
-        <div id="reg-step-4" style="display:none">
-          <div class="preview-section">Step 4 — Modal Discord muncul: isi Nickname saja</div>
+        <!-- ── Modal single-step ── -->
+        <div id="reg-modal">
+          <div class="preview-section">User klik "Daftar Sekarang" → modal Discord muncul</div>
           <div class="modal-wrap">
             <div class="modal-overlay">
-              <div class="modal-title">Satu Langkah Lagi!</div>
-              <div class="modal-subtitle" id="modal-summary" style="font-size:13px; color:#b9bbbe; margin-bottom:16px;"></div>
+              <div class="modal-title">✦ Daftarkan Akun Game Kamu</div>
+              <div class="form-group">
+                <label class="form-label">Server <span class="required">*</span></label>
+                <select class="form-select" id="server-select">
+                  <option value="">— Pilih Server —</option>
+                  <option value="Asia">Asia</option>
+                  <option value="NA">NA</option>
+                  <option value="EU">EU</option>
+                  <option value="KR">KR</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Guild</label>
+                <select class="form-select" id="guild-select">
+                  <option value="">— Tidak punya guild —</option>
+                  <option value="amateurs">amateurs</option>
+                  <option value="virtue">virtue</option>
+                  <option value="Octagram">Octagram</option>
+                </select>
+                <div class="form-hint">Opsional. Kosongkan jika belum bergabung dengan guild.</div>
+              </div>
               <div class="form-group">
                 <label class="form-label">Nickname In-game <span class="required">*</span></label>
                 <input class="form-input" type="text" placeholder="Nickname kamu di game" id="nickname-input" />
                 <div class="form-hint">Nickname harus unik dan belum terdaftar.</div>
               </div>
               <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="regBackStep(4)">← Kembali</button>
+                <button class="btn btn-secondary">← Batal</button>
                 <button class="btn btn-primary" onclick="regSubmit()">✦ Daftarkan</button>
               </div>
             </div>
@@ -1681,150 +1585,34 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
     document.getElementById('channel-name').textContent = channelNames[id] || id;
   }
 
-  // ── Multi-step Register Flow ──
-  const gameConfig = {
-    'e7':    { label: 'Epic Seven (E7)', servers: ['Asia','NA','EU','KR'], hasGuild: true  },
-    'roblox':{ label: 'Roblox',          servers: ['Asia','NA','EU'],      hasGuild: false },
-    'other': { label: 'Game Lainnya',    servers: ['Asia','NA'],           hasGuild: false },
-  };
-
-  let regState = { game: '', server: '', guild: '' };
-
-  const stepLabels = ['', 'Pilih Game', 'Pilih Server', 'Pilih Guild', 'Isi Nickname'];
-
-  function updateStepIndicator(currentStep, totalSteps) {
-    for (let i = 1; i <= 4; i++) {
-      const dot  = document.getElementById('dot-' + i);
-      const line = document.getElementById('line-' + i);
-      if (i < currentStep)       { dot.className = 'step-dot done'; if (line) line.className = 'step-line done'; }
-      else if (i === currentStep) { dot.className = 'step-dot active'; if (line) line.className = 'step-line'; }
-      else                        { dot.className = 'step-dot'; if (line) line.className = 'step-line'; }
-    }
-    document.getElementById('step-label').textContent = stepLabels[currentStep] || '';
-  }
-
-  function showRegStep(step) {
-    [1,2,3,4].forEach(i => {
-      const el = document.getElementById('reg-step-' + i);
-      if (el) el.style.display = (i === step) ? 'block' : 'none';
-    });
-    document.getElementById('reg-response').style.display = 'none';
-    const cfg = gameConfig[regState.game];
-    const totalSteps = cfg && cfg.hasGuild ? 4 : 3;
-    updateStepIndicator(step, totalSteps);
-  }
-
-  function onGameChange(val) {
-    regState.game = val;
-    document.getElementById('btn-step1').disabled = !val;
-    // Update step label dot-3 tooltip depending on hasGuild
-    const cfg = gameConfig[val];
-    const dot3 = document.getElementById('dot-3');
-    dot3.title = cfg && cfg.hasGuild ? 'Pilih Guild' : 'Dilewati (game ini tidak punya guild)';
-  }
-
-  function regNextStep(fromStep) {
-    if (fromStep === 1) {
-      const val = document.getElementById('game-select').value;
-      if (!val) return;
-      regState.game = val;
-      const cfg = gameConfig[val];
-      // populate server
-      const sel = document.getElementById('server-select');
-      sel.innerHTML = '<option value="">— Pilih Server —</option>';
-      cfg.servers.forEach(s => {
-        const o = document.createElement('option');
-        o.value = s.toLowerCase(); o.textContent = s; sel.appendChild(o);
-      });
-      document.getElementById('s2-game').textContent = cfg.label;
-      showRegStep(2);
-    } else if (fromStep === 2) {
-      const val = document.getElementById('server-select').value;
-      if (!val) return;
-      regState.server = val;
-      const cfg = gameConfig[regState.game];
-      if (cfg.hasGuild) {
-        document.getElementById('s3-game').textContent = cfg.label;
-        document.getElementById('s3-server').textContent = val.charAt(0).toUpperCase() + val.slice(1);
-        showRegStep(3);
-      } else {
-        // Skip guild step → go to modal
-        regState.guild = '';
-        showModalStep();
-      }
-    } else if (fromStep === 3) {
-      const val = document.getElementById('guild-select').value;
-      if (!val) return;
-      regState.guild = val;
-      showModalStep();
-    }
-  }
-
-  function showModalStep() {
-    [1,2,3].forEach(i => {
-      const el = document.getElementById('reg-step-' + i);
-      if (el) el.style.display = 'none';
-    });
-    const cfg = gameConfig[regState.game];
-    const totalSteps = cfg && cfg.hasGuild ? 4 : 3;
-    updateStepIndicator(totalSteps, totalSteps);
-
-    let summary = `Game: <strong>${cfg.label}</strong> &nbsp;·&nbsp; Server: <strong>${regState.server.toUpperCase()}</strong>`;
-    if (regState.guild) summary += ` &nbsp;·&nbsp; Guild: <strong>${regState.guild}</strong>`;
-    document.getElementById('modal-summary').innerHTML = summary;
-    document.getElementById('reg-step-4').style.display = 'block';
-    document.getElementById('reg-response').style.display = 'none';
-  }
-
-  function regBackStep(fromStep) {
-    if (fromStep === 4) {
-      const cfg = gameConfig[regState.game];
-      showRegStep(cfg && cfg.hasGuild ? 3 : 2);
-    } else {
-      showRegStep(fromStep - 1);
-    }
-  }
-
+  // ── Register Form ──
   function regSubmit() {
+    const server   = document.getElementById('server-select').value.trim();
+    const guild    = document.getElementById('guild-select').value.trim();
     const nickname = document.getElementById('nickname-input').value.trim();
+    if (!server)   { document.getElementById('server-select').focus(); return; }
     if (!nickname) { document.getElementById('nickname-input').focus(); return; }
-    const cfg = gameConfig[regState.game];
-    // Build response fields
     const pairs = [
       ['Nickname', nickname],
-      ['Game', cfg.label],
-      ['Server', regState.server.toUpperCase()],
+      ['Server', server],
+      ['Game', 'Epic Seven (E7)'],
     ];
-    if (regState.guild) pairs.push(['Guild', regState.guild]);
+    if (guild) pairs.push(['Guild', guild]);
     const html = pairs.map(([k,v]) =>
       `<div><div class="embed-field-name">${k}</div><div class="embed-field-value">${v}</div></div>`
     ).join('');
     document.getElementById('response-fields').innerHTML = html;
-    // Hide all steps, show response
-    [1,2,3,4].forEach(i => {
-      const el = document.getElementById('reg-step-' + i);
-      if (el) el.style.display = 'none';
-    });
+    document.getElementById('reg-modal').style.display = 'none';
     document.getElementById('reg-response').style.display = 'block';
-    updateStepIndicator(5, 4); // all done
-    [1,2,3,4].forEach(i => {
-      const d = document.getElementById('dot-' + i);
-      if (d) d.className = 'step-dot done';
-      const l = document.getElementById('line-' + i);
-      if (l) l.className = 'step-line done';
-    });
   }
 
   function regReset() {
-    regState = { game: '', server: '', guild: '' };
-    document.getElementById('game-select').value = '';
+    document.getElementById('server-select').value = '';
+    document.getElementById('guild-select').value = '';
     document.getElementById('nickname-input').value = '';
-    document.getElementById('btn-step1').disabled = true;
-    showRegStep(1);
+    document.getElementById('reg-modal').style.display = 'block';
+    document.getElementById('reg-response').style.display = 'none';
   }
-
-  // Init
-  showRegStep(1);
 
   // Sidebar toggle (mobile)
   function toggleSidebar() {

@@ -10,20 +10,34 @@ Celestial adalah Discord bot untuk manajemen guild game dan auto role-assignment
 
 ### `/register`
 
-- **Tipe:** User command
-- **Aksi:** Membuka modal form Discord
+- **Tipe:** User command (via button "Daftar Sekarang" di `#register-here`)
+- **Aksi:** Membuka modal Discord 1 langkah dengan 3 field
 - **Fields:**
   | Field | Tipe | Wajib | Keterangan |
   |---|---|---|---|
+  | Server | Text | ✅ | Region server (contoh: Asia, NA, EU, KR) |
+  | Guild | Text | ❌ | Nama guild (opsional, kosongkan jika belum punya guild) |
   | Nickname | Text | ✅ | Nickname in-game, harus unik di seluruh database |
-  | Guild | Text | ✅ | Nama guild di game |
-  | Server | Text | ✅ | Region server (contoh: Asia, NA, EU) |
-  | Game | Text | ✅ | Nama game (contoh: E7) |
+- **Catatan:** Game saat ini default Epic Seven (E7). Field Game tidak ditampilkan di modal.
 - **Validasi:**
   - Nickname yang sudah ada di database → ditolak dengan pesan error
 - **Setelah submit:**
   - `APPROVAL_MODE=manual` → status `pending`, bot kirim ke `#approval-request`
-  - `APPROVAL_MODE=auto` → status langsung `approved`, role di-assign, guild list update
+
+### Register Flow
+
+```
+User klik "Daftar Sekarang" di #register-here
+    ↓
+Modal Discord muncul (1 langkah):
+  - Server     : Text input  [wajib]   contoh: Asia
+  - Guild      : Text input  [opsional]
+  - Nickname   : Text input  [wajib]
+    ↓
+Submit → Bot proses registrasi → status pending → kirim ke #approval-request
+```
+
+Catatan: Game saat ini default Epic Seven (E7). Jika ke depan ada multi-game, field Game bisa ditambahkan kembali.
 
 ---
 

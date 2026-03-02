@@ -15,7 +15,7 @@ Celestial adalah Discord bot untuk manajemen guild game dan auto role-assignment
 - **Fields:**
   | Field | Tipe | Wajib | Keterangan |
   |---|---|---|---|
-  | Server | Text | ✅ | Region server (contoh: Asia, NA, EU, KR) |
+  | Server | Text | ✅ | Region server (contoh: Korea, Global, Asia, Japan, Europe) |
   | Guild | Text | ❌ | Nama guild (opsional, kosongkan jika belum punya guild) |
   | Nickname | Text | ✅ | Nickname in-game, harus unik per server (kombinasi Nickname+Server tidak boleh sama) |
 - **Catatan:** Game saat ini default Epic Seven (E7). Field Game tidak ditampilkan di modal.
@@ -30,7 +30,7 @@ Celestial adalah Discord bot untuk manajemen guild game dan auto role-assignment
 User klik "Daftar Sekarang" di #register-here
     ↓
 Modal Discord muncul (1 langkah):
-  - Server     : Text input  [wajib]   contoh: Asia
+  - Server     : Text input  [wajib]   contoh: Asia, Korea, Global
   - Guild      : Text input  [opsional]
   - Nickname   : Text input  [wajib]
     ↓
@@ -253,7 +253,7 @@ Title     : 🌌 SELAMAT DATANG DI CELESTIALS SERVER!
 Subtitle  : Sebelum menjelajahi channel lain, tolong Baca, Patuhi & Pahami Rules di sini.
 Rules     : 6 poin rules server (lihat konten aktual)
 Footer    : ✦ Celestial · Pelanggaran → kick/ban
-CTA bawah : React ✅ → channel #register-here & #pilih-roles terbuka
+CTA bawah : React ✅ → channel #register-here & #other-games terbuka
 Color     : Kuning/warning
 Thumbnail : Logo Celestial (lingkaran dengan ✦)
 ```
@@ -269,13 +269,13 @@ on_raw_reaction_add(payload)
 Bot assign role "Member" ke user
     │
     ▼
-Channel #register-here & #pilih-roles unlock
+Channel #register-here & #other-games unlock
 (permission Discord: hanya visible untuk role "Member")
 ```
 
 **Catatan setup manual di Discord:**
 1. Buat role `Member`
-2. Set permission `#register-here` dan `#pilih-roles` → hanya visible ke role `Member`
+2. Set permission `#register-here` dan `#other-games` → hanya visible ke role `Member`
 3. Channel mention di embed menggunakan `<#CHANNEL_ID>` (dikonfigurasi via env var)
 
 ### Channel Mentions di Embed

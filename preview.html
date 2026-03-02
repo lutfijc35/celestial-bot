@@ -993,20 +993,16 @@
                 <label class="form-label">Server <span class="required">*</span></label>
                 <select class="form-select" id="server-select">
                   <option value="">— Pilih Server —</option>
+                  <option value="Korea">Korea</option>
+                  <option value="Global">Global</option>
                   <option value="Asia">Asia</option>
-                  <option value="NA">NA</option>
-                  <option value="EU">EU</option>
-                  <option value="KR">KR</option>
+                  <option value="Japan">Japan</option>
+                  <option value="Europe">Europe</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label">Guild</label>
-                <select class="form-select" id="guild-select">
-                  <option value="">— Tidak punya guild —</option>
-                  <option value="amateurs">amateurs</option>
-                  <option value="virtue">virtue</option>
-                  <option value="Octagram">Octagram</option>
-                </select>
+                <input class="form-input" type="text" placeholder="Nama guild kamu (opsional)" id="guild-input" />
                 <div class="form-hint">Opsional. Kosongkan jika belum bergabung dengan guild.</div>
               </div>
               <div class="form-group">
@@ -1539,7 +1535,7 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
                     <div class="rules-cta-subtitle">Setelah react, channel berikut akan terbuka:</div>
                     <div class="rules-cta-channels">
                       <div class="rules-cta-channel">🎮 <span class="mention">#register-here</span> — Daftarkan akun Epic Seven kamu</div>
-                      <div class="rules-cta-channel">🎭 <span class="mention">#pilih-roles</span> — Ambil role selain Epic Seven</div>
+                      <div class="rules-cta-channel">🎭 <span class="mention">#other-games</span> — Ambil role selain game Epic Seven</div>
                     </div>
                   </div>
                 </div>
@@ -1588,7 +1584,7 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
   // ── Register Form ──
   function regSubmit() {
     const server   = document.getElementById('server-select').value.trim();
-    const guild    = document.getElementById('guild-select').value.trim();
+    const guild    = document.getElementById('guild-input').value.trim();
     const nickname = document.getElementById('nickname-input').value.trim();
     if (!server)   { document.getElementById('server-select').focus(); return; }
     if (!nickname) { document.getElementById('nickname-input').focus(); return; }
@@ -1608,7 +1604,7 @@ Gunakan <span style="color:#5865f2">/profile</span> untuk cek akun yang sudah ad
 
   function regReset() {
     document.getElementById('server-select').value = '';
-    document.getElementById('guild-select').value = '';
+    document.getElementById('guild-input').value = '';
     document.getElementById('nickname-input').value = '';
     document.getElementById('reg-modal').style.display = 'block';
     document.getElementById('reg-response').style.display = 'none';

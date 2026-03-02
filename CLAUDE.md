@@ -65,7 +65,7 @@ celestial/
 | Event | Deskripsi |
 |---|---|
 | `on_member_join` | Bot kirim embed welcome ke `#welcome` channel secara otomatis |
-| `on_raw_reaction_add` | Deteksi react ✅ di pesan rules → assign role `Member` → unlock #register-here & #pilih-roles |
+| `on_raw_reaction_add` | Deteksi react ✅ di pesan rules → assign role `Member` → unlock #register-here & #other-games |
 
 ## Role Assignment Logic
 
@@ -107,7 +107,7 @@ GUILD_LIST_CHANNEL_ID=channel_id_for_guild_list
 WELCOME_CHANNEL_ID=channel_id_for_welcome
 RULES_MESSAGE_ID=message_id_of_rules_post
 REGISTER_CHANNEL_ID=channel_id_for_register_here
-PILIH_ROLES_CHANNEL_ID=channel_id_for_pilih_roles
+OTHER_GAMES_CHANNEL_ID=channel_id_for_other_games
 MEMBER_ROLE_ID=role_id_assigned_after_rules_react
 APPROVAL_MODE=manual   # manual | auto
 DB_PATH=data/celestial.db

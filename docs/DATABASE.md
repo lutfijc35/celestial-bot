@@ -104,13 +104,59 @@ CREATE TABLE IF NOT EXISTS guild_list_message (
 
 ---
 
+## Tabel: `guild_list_pages`
+
+Menyimpan message ID tiap halaman guild list. Mendukung multiple messages untuk server dengan 30+ guild
+(Discord limit 25 field dan 6000 char per embed).
+
+```sql
+CREATE TABLE IF NOT EXISTS guild_list_pages (
+    channel_id  TEXT    NOT NULL,
+    page_index  INTEGER NOT NULL,           -- Nomor halaman (0-based)
+    message_id  TEXT    NOT NULL,           -- ID pesan Discord yang akan di-edit
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (channel_id, page_index)
+);
+```
+
+**Fungsi helper:**
+- `get_guild_list_pages(channel_id)` → `list[str]` — semua message ID urut page_index asc
+- `upsert_guild_list_page(channel_id, page_index, message_id)` — insert/update satu halaman
+- `delete_guild_list_pages_above(channel_id, max_index)` — hapus halaman ekstra saat jumlah guild berkurang
+
+**Catatan:** Tabel `guild_list_message` tetap dipakai oleh `update_member_list()` untuk `#member-list` channel (single message).
+
+---
+
+## Tabel: `bot_settings`
+
+Menyimpan konfigurasi bot yang di-set via command (bukan env var).
+
+```sql
+CREATE TABLE IF NOT EXISTS bot_settings (
+    key    TEXT NOT NULL UNIQUE,
+    value  TEXT NOT NULL
+);
+```
+
+**Contoh data:**
+| key | value |
+|---|---|
+| rules_message_id | 1234567890123456789 |
+| profile_channel_id | 9876543210987654321 |
+
+**Diisi oleh:** Admin via `/setup-rules` dan `/setup-profile` (otomatis, tidak perlu edit `.env`).
+
+---
+
 ## Relasi Antar Tabel
 
 ```
 accounts (discord_id) ──────────── Discord User
 accounts (guild) ──────────────── guild_roles (guild_name)
 accounts (id) ─────────────────── pending_approvals (account_id)
-guild_list_message (channel_id) ── Discord Channel (#guild-list)
+guild_list_pages (channel_id) ──── Discord Channel (#guild-list)  ← multi-page guild list
+guild_list_message (channel_id) ── Discord Channel (#member-list) ← single message member list
 ```
 
 ---

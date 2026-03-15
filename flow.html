@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celestial Bot — Flow Diagram</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'gg sans', 'Noto Sans', Whitney, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #1e1f22;
+      color: #dcddde;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* ── Header ── */
+    .flow-header {
+      background: #2b2d31;
+      border-bottom: 1px solid #1a1b1e;
+      padding: 20px 32px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #f2f3f5;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .flow-header span {
+      font-size: 13px;
+      font-weight: 400;
+      color: #949ba4;
+      margin-left: 4px;
+    }
+
+    /* ── Nav ── */
+    .flow-nav {
+      background: #2b2d31;
+      border-bottom: 1px solid #1a1b1e;
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .flow-nav a {
+      display: inline-block;
+      padding: 12px 16px;
+      color: #949ba4;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .flow-nav a:hover {
+      color: #dcddde;
+    }
+
+    .flow-nav a.active {
+      color: #f2f3f5;
+      border-bottom-color: #5865f2;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Section ── */
+    section {
+      margin-bottom: 72px;
+      scroll-margin-top: 100px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      color: #949ba4;
+      font-size: 13px;
+      margin-bottom: 32px;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid #2b2d31;
+      margin-bottom: 32px;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 32px;
+      padding: 14px 18px;
+      background: #2b2d31;
+      border-radius: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: #b5bac1;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── Flow container ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* ── Nodes ── */
+    .node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 220px;
+      max-width: 340px;
+      width: 100%;
+      position: relative;
+      line-height: 1.4;
+    }
+
+    .node-icon {
+      margin-right: 6px;
+      font-size: 15px;
+    }
+
+    .node-sub {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      margin-top: 3px;
+      opacity: 0.8;
+    }
+
+    /* Color variants */
+    .node-process {
+      background: #3c4270;
+      border: 1px solid #5865f2;
+      color: #c9cdf7;
+    }
+
+    .node-decision {
+      background: #3d3117;
+      border: 1px solid #faa61a;
+      color: #f9d77a;
+      clip-path: polygon(16px 0%, calc(100% - 16px) 0%, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0% 50%);
+      padding: 10px 32px;
+      min-width: 240px;
+    }
+
+    .node-success {
+      background: #1a3d2b;
+      border: 1px solid #3ba55c;
+      color: #79cf8e;
+    }
+
+    .node-reject {
+      background: #3d1a1a;
+      border: 1px solid #ed4245;
+      color: #f38183;
+    }
+
+    .node-info {
+      background: #2b2d31;
+      border: 1px solid #4e5058;
+      color: #949ba4;
+      font-size: 12px;
+    }
+
+    .node-start {
+      background: #2e3192;
+      border: 1px solid #7289da;
+      color: #dde0ff;
+      border-radius: 20px;
+    }
+
+    .node-end {
+      background: #1e3a29;
+      border: 1px solid #3ba55c;
+      color: #79cf8e;
+      border-radius: 20px;
+    }
+
+    /* ── Arrow ── */
+    .arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      color: #4e5058;
+    }
+
+    .arrow-line {
+      width: 2px;
+      height: 20px;
+      background: #4e5058;
+    }
+
+    .arrow-head {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #4e5058;
+    }
+
+    .arrow-label {
+      font-size: 11px;
+      color: #5865f2;
+      font-weight: 500;
+      margin: -2px 0;
+      background: #1e1f22;
+      padding: 0 6px;
+    }
+
+    /* ── Split / Branch ── */
+    .split {
+      display: flex;
+      width: 100%;
+      max-width: 700px;
+      position: relative;
+    }
+
+    .split::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(50% + 1px);
+      height: 20px;
+      border-top: 2px solid #4e5058;
+      border-left: 2px solid #4e5058;
+      border-radius: 4px 0 0 0;
+    }
+
+    .split::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(50%);
+      height: 20px;
+      border-top: 2px solid #4e5058;
+      border-right: 2px solid #4e5058;
+      border-radius: 0 4px 0 0;
+    }
+
+    .branch {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 20px;
+      gap: 0;
+    }
+
+    .branch-left {
+      border-right: 1px solid transparent;
+    }
+
+    .branch-label {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+    }
+
+    .label-yes {
+      background: #1a3d2b;
+      color: #3ba55c;
+    }
+
+    .label-no {
+      background: #3d1a1a;
+      color: #ed4245;
+    }
+
+    .label-approve {
+      background: #1a3d2b;
+      color: #3ba55c;
+    }
+
+    .label-reject {
+      background: #3d1a1a;
+      color: #ed4245;
+    }
+
+    /* ── Merge ── */
+    .merge {
+      display: flex;
+      width: 100%;
+      max-width: 700px;
+      position: relative;
+      height: 24px;
+    }
+
+    .merge::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(50%);
+      height: 24px;
+      border-bottom: 2px solid #4e5058;
+      border-left: 2px solid #4e5058;
+      border-radius: 0 0 0 4px;
+    }
+
+    .merge::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(50% + 1px);
+      height: 24px;
+      border-bottom: 2px solid #4e5058;
+      border-right: 2px solid #4e5058;
+      border-radius: 0 0 4px 0;
+    }
+
+    /* ── Side note ── */
+    .side-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .side-note-line {
+      width: 40px;
+      height: 2px;
+      background: #4e5058;
+      margin-top: 10px;
+      flex-shrink: 0;
+    }
+
+    .side-note-box {
+      flex: 1;
+      font-size: 11px;
+      color: #949ba4;
+      background: #2b2d31;
+      border: 1px solid #3f4147;
+      border-radius: 4px;
+      padding: 6px 10px;
+      line-height: 1.5;
+    }
+
+    /* ── Wide split for diagram 2 ── */
+    .split-wide {
+      display: flex;
+      width: 100%;
+      max-width: 700px;
+      gap: 20px;
+    }
+
+    .split-wide .branch {
+      padding-top: 0;
+    }
+
+    /* ── Horizontal connector between branches ── */
+    .h-connector {
+      width: 100%;
+      max-width: 700px;
+      position: relative;
+      height: 28px;
+    }
+
+    .h-connector::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 25%;
+      width: 50%;
+      height: 28px;
+      border-bottom: 2px solid #4e5058;
+      border-left: 2px solid #4e5058;
+      border-right: 2px solid #4e5058;
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* ── Command chip ── */
+    .cmd {
+      display: inline-block;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      background: #111214;
+      border: 1px solid #3f4147;
+      border-radius: 3px;
+      padding: 1px 6px;
+      color: #b9bbbe;
+    }
+
+    /* ── ─────────────── Responsive ── */
+    @media (max-width: 600px) {
+      .flow-header {
+        padding: 16px;
+        font-size: 16px;
+      }
+
+      .flow-nav a {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+
+      .page {
+        padding: 24px 16px 60px;
+      }
+
+      .node {
+        min-width: 160px;
+        font-size: 12px;
+        padding: 8px 14px;
+      }
+
+      .node-decision {
+        padding: 8px 24px;
+        min-width: 180px;
+        clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0% 50%);
+      }
+
+      .split, .split-wide, .h-connector {
+        max-width: 100%;
+      }
+
+      .legend {
+        gap: 8px;
+      }
+
+      .legend-item {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="flow-header">
+  ✦ Celestial Bot <span>— Flow Diagram</span>
+</div>
+
+<!-- ── Nav ── -->
+<div class="flow-nav">
+  <a href="#user-journey" class="active">👤 User Journey</a>
+  <a href="#guild-assignment">🎭 Guild Assignment</a>
+  <a href="#admin-mgmt">⚙️ Admin Management</a>
+</div>
+
+<div class="page">
+
+  <!-- ── Legend ── -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#3c4270;border:1px solid #5865f2"></div>
+      Proses
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#3d3117;border:1px solid #faa61a"></div>
+      Keputusan
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1a3d2b;border:1px solid #3ba55c"></div>
+      Sukses / Approve
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#3d1a1a;border:1px solid #ed4245"></div>
+      Gagal / Reject
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#2b2d31;border:1px solid #4e5058"></div>
+      Info Channel / Command
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 1 — User Journey
+  ════════════════════════════════════════════ -->
+  <section id="user-journey">
+    <div class="section-title">👤 User Journey</div>
+    <div class="section-desc">Alur lengkap dari member bergabung ke server hingga mendapat role guild.</div>
+    <hr class="section-divider">
+
+    <div class="flow">
+
+      <!-- Join -->
+      <div class="node node-start">
+        <span class="node-icon">🎉</span> Member Join Server
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Welcome -->
+      <div class="node node-process">
+        <span class="node-icon">📨</span> Bot kirim welcome embed
+        <span class="node-sub">→ <span class="cmd">#welcome</span></span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Read rules -->
+      <div class="node node-info">
+        <span class="node-icon">📖</span> User baca <span class="cmd">#rules</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- React rules -->
+      <div class="node node-process">
+        <span class="node-icon">✅</span> User react ✅ di pesan rules
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Assign Member role -->
+      <div class="node node-success">
+        <span class="node-icon">🎭</span> Bot assign role <strong>Member</strong>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Channel unlock -->
+      <div class="node node-info">
+        Channel terbuka: <span class="cmd">#register-here</span> · <span class="cmd">#other-games</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Klik CTA -->
+      <div class="node node-process">
+        <span class="node-icon">🖱️</span> User klik "Daftar Sekarang" di <span class="cmd">#register-here</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Modal -->
+      <div class="node node-process">
+        <span class="node-icon">📝</span> Modal muncul
+        <span class="node-sub">Server &nbsp;·&nbsp; Guild (opsional) &nbsp;·&nbsp; Nickname</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Submit -->
+      <div class="node node-process">
+        <span class="node-icon">📤</span> Submit → status: <strong>pending</strong>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Approval embed -->
+      <div class="node node-info">
+        <span class="node-icon">📬</span> Bot kirim embed ke <span class="cmd">#approval-request</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Admin review -->
+      <div class="node node-decision">
+        <span class="node-icon">👮</span> Admin review
+      </div>
+
+      <!-- Split -->
+      <div class="split">
+        <!-- Approve branch -->
+        <div class="branch">
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <span class="branch-label label-approve">✅ Approve</span>
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <div class="node node-success" style="max-width:240px">
+            Guild Assignment<br>
+            <span class="node-sub">(lihat Diagram 2)</span>
+          </div>
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <div class="node node-success" style="max-width:240px">
+            <span class="node-icon">🎭</span> Role di-assign ke user
+          </div>
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <div class="node node-success" style="max-width:240px">
+            <span class="node-icon">📋</span> Profil di-post ke <span class="cmd">#tampil-profile</span>
+          </div>
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <div class="node node-info" style="max-width:240px">
+            <span class="node-icon">🔄</span> <span class="cmd">#guild-list</span> otomatis diperbarui
+          </div>
+        </div>
+
+        <!-- Reject branch -->
+        <div class="branch">
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <span class="branch-label label-reject">❌ Reject</span>
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <div class="node node-reject" style="max-width:240px">
+            <span class="node-icon">🔔</span> Bot notif reject ke user
+            <span class="node-sub">(ephemeral)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 2 — Guild Assignment Logic
+  ════════════════════════════════════════════ -->
+  <section id="guild-assignment">
+    <div class="section-title">🎭 Guild Assignment Logic</div>
+    <div class="section-desc">Decision tree role assignment setelah akun di-approve.</div>
+    <hr class="section-divider">
+
+    <div class="flow">
+
+      <!-- Akun di-approve -->
+      <div class="node node-start">
+        <span class="node-icon">✅</span> Akun di-approve
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Cek guild -->
+      <div class="node node-decision">
+        Guild user ada di <span style="font-family:monospace;font-size:11px">guild_roles</span>?
+      </div>
+
+      <!-- Split -->
+      <div class="split">
+        <!-- Ada -->
+        <div class="branch">
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <span class="branch-label label-yes">Ada</span>
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <div class="node node-success" style="max-width:240px">
+            <span class="node-icon">🎭</span> Assign <strong>role guild</strong>
+          </div>
+        </div>
+
+        <!-- Tidak ada -->
+        <div class="branch">
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <span class="branch-label label-no">Tidak ada</span>
+          <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+          <div class="node node-process" style="max-width:240px">
+            <span class="node-icon">🌐</span> Assign <strong>role server/region</strong>
+            <span class="node-sub">(fallback)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Merge -->
+      <div class="h-connector"></div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Notif -->
+      <div class="node node-success">
+        <span class="node-icon">🔔</span> Kirim notif ke user
+        <span class="node-sub">(ephemeral reply)</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 3 — Admin Guild Management
+  ════════════════════════════════════════════ -->
+  <section id="admin-mgmt">
+    <div class="section-title">⚙️ Admin Guild Management</div>
+    <div class="section-desc">Alur admin setup guild dan auto-update channel guild-list.</div>
+    <hr class="section-divider">
+
+    <div class="flow">
+
+      <!-- Start -->
+      <div class="node node-start">
+        <span class="node-icon">🛡️</span> Admin setup guild
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- /set-guild -->
+      <div class="node node-info">
+        <span class="cmd">/set-guild &lt;guild&gt; &lt;@role&gt;</span>
+      </div>
+      <div class="node node-process" style="margin-top:6px">
+        Mapping guild → Discord role tersimpan di DB
+      </div>
+
+      <div class="arrow"><div class="arrow-line" style="height:24px"></div><div class="arrow-head"></div></div>
+
+      <!-- /guild-set-info -->
+      <div class="node node-info">
+        <span class="cmd">/guild-set-info &lt;guild&gt; &lt;level&gt; &lt;tipe&gt; &lt;keterangan&gt;</span>
+      </div>
+      <div class="node node-process" style="margin-top:6px">
+        Info guild tersimpan
+        <span class="node-sub">level &nbsp;·&nbsp; tipe (casual / semi_compe / compe) &nbsp;·&nbsp; deskripsi</span>
+      </div>
+
+      <div class="arrow"><div class="arrow-line" style="height:24px"></div><div class="arrow-head"></div></div>
+
+      <!-- Auto-update triggered -->
+      <div class="node node-success">
+        <span class="node-icon">🔄</span> Auto-update <span class="cmd">#guild-list</span> triggered
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- guild-info force refresh -->
+      <div class="node node-info">
+        <span class="cmd">/guild-info</span> ← force refresh manual (jika diperlukan)
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Channel updated -->
+      <div class="node node-end">
+        <span class="node-icon">✦</span> <span class="cmd">#guild-list</span> channel diperbarui
+      </div>
+
+      <!-- Trigger list -->
+      <div class="arrow"><div class="arrow-line" style="height:28px"></div></div>
+
+      <div style="width:100%;max-width:420px;background:#2b2d31;border:1px solid #3f4147;border-radius:8px;padding:16px 18px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;color:#949ba4;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Auto-update Triggers</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12px;color:#b5bac1;display:flex;gap:8px;align-items:flex-start">
+            <span style="color:#3ba55c;flex-shrink:0">✅</span> User register &amp; akun di-approve
+          </div>
+          <div style="font-size:12px;color:#b5bac1;display:flex;gap:8px;align-items:flex-start">
+            <span style="color:#3ba55c;flex-shrink:0">✅</span> User jalankan <span class="cmd">/unregister</span>
+          </div>
+          <div style="font-size:12px;color:#b5bac1;display:flex;gap:8px;align-items:flex-start">
+            <span style="color:#3ba55c;flex-shrink:0">✅</span> Admin jalankan <span class="cmd">/guild-set-info</span>
+          </div>
+          <div style="font-size:12px;color:#b5bac1;display:flex;gap:8px;align-items:flex-start">
+            <span style="color:#3ba55c;flex-shrink:0">✅</span> Admin jalankan <span class="cmd">/guild-info</span> (force refresh)
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Highlight active nav item on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.flow-nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

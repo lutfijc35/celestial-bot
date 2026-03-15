@@ -97,23 +97,31 @@ Catatan: Game saat ini default Epic Seven (E7). Jika ke depan ada multi-game, fi
 - **Parameter:**
   | Parameter | Tipe | Keterangan |
   |---|---|---|
-  | guild | String | Nama guild |
   | role | Role | Discord role yang di-mapping |
-- **Aksi:** Simpan mapping `guild_name → role_id` ke database
+- **Aksi:** Simpan mapping `guild_name → role_id` ke database, dengan `guild_name` diambil otomatis dari `role.name`
 - **Jika guild sudah ada:** Update role mapping yang ada
+- **Catatan:** Nama guild = nama role Discord. Pastikan nama role sudah sesuai nama guild sebelum menjalankan command ini.
 
 ---
 
 ### `/guild-set-info` (Admin)
 
 - **Tipe:** Admin command
-- **Parameter:**
-  | Parameter | Tipe | Keterangan |
+- **Flow:**
+  1. Jalankan `/guild-set-info` — muncul dropdown berisi guild dari database
+  2. Pilih guild → muncul dropdown tipe (Casual / Semi Kompetitif / Kompetitif)
+  3. Pilih tipe → modal terbuka dengan level + keterangan (pre-filled)
+  4. Submit → guild list ter-update otomatis
+- **Dropdown:**
+  | Step | Pilihan |
+  |---|---|
+  | Guild | Daftar guild dari database |
+  | Tipe | `casual` / `semi_compe` / `compe` |
+- **Modal Fields:**
+  | Field | Tipe | Keterangan |
   |---|---|---|
-  | guild | String | Nama guild |
-  | level | Integer | Level guild (angka, contoh: 20) |
-  | tipe | Choice | `casual` / `semi_compe` / `compe` |
-  | keterangan | String | Deskripsi singkat guild |
+  | Level | TextInput (angka) | Level guild (contoh: 20) |
+  | Keterangan | TextInput (opsional) | Deskripsi singkat guild |
 - **Setelah update:** Auto-trigger update guild list channel
 
 ---
@@ -125,6 +133,51 @@ Catatan: Game saat ini default Epic Seven (E7). Jika ke depan ada multi-game, fi
 - **Behavior:**
   - Jika pesan lama ada → edit pesan tersebut
   - Jika pesan lama tidak ada → kirim pesan baru, simpan `message_id`
+
+---
+
+### `/setup-welcome` (Admin)
+
+- **Tipe:** Admin command
+- **Permission:** `manage_channels`
+- **Aksi:** Jalankan di channel yang diinginkan → channel tersebut disimpan sebagai welcome channel
+- **Penyimpanan:** Key `welcome_channel_id` di tabel `bot_settings`
+- **Priority:** DB (via command) → env var `WELCOME_CHANNEL_ID` → tidak kirim (0 / None)
+- **Catatan:** Update langsung tanpa restart; jika belum pernah diset dan env var kosong, welcome tidak dikirim (silent skip)
+
+---
+
+### `/bot-status` (Admin)
+
+- **Tipe:** Admin command
+- **Permission:** `manage_guild`
+- **Aksi:** Tampilkan embed ephemeral berisi ringkasan status bot:
+  | Field | Isi |
+  |---|---|
+  | Uptime | Waktu berjalan sejak `on_ready` (format: `Xj Ym Zd`) |
+  | Latency | Latency ke Discord gateway (ms) |
+  | Statistik Akun | Jumlah approved / pending / rejected / total dari tabel `accounts` |
+  | Guild Terdaftar | Jumlah baris di tabel `guild_roles` |
+  | Konfigurasi | Channel welcome, profile, dan rules message ID yang aktif |
+- **Catatan:** Channel yang belum dikonfigurasi ditampilkan sebagai `— belum diset`
+
+---
+
+### `/admin-unregister` (Admin)
+
+- **Tipe:** Admin command
+- **Parameter:**
+  | Parameter | Tipe | Keterangan |
+  |---|---|---|
+  | member | Member | User Discord yang akunnya ingin dihapus |
+- **Aksi:**
+  - Jika user tidak punya akun → reply error ephemeral
+  - Jika user punya 1 akun → langsung hapus, update guild list + member list
+  - Jika user punya > 1 akun → tampilkan select menu untuk pilih akun mana
+- **Setelah hapus:**
+  - Akun dihapus dari database (termasuk pending approval jika ada)
+  - `#guild-list` dan `#member-list` embed auto-update
+- **Catatan:** Berlaku untuk semua status akun (pending, approved, rejected)
 
 ---
 
@@ -141,10 +194,38 @@ Input: account (nickname, guild, server, game) setelah approved
 
 2. discord.Guild.get_member(account.discord_id).add_roles(role_id)
 
-3. Reply ke user (ephemeral): "Role @guild berhasil di-assign"
+3. Assign DEFAULT_ROLE_ID (jika dikonfigurasi di .env)
+   → Role yang SELALU diberikan ke semua user yang approved
 
-4. Trigger: update_guild_list_channel()
+4. Reply ke user (ephemeral): "Role @guild berhasil di-assign"
+
+5. Trigger: update_guild_list_channel()
 ```
+
+### Syarat Discord: Role Hierarchy
+
+Bot hanya bisa assign role yang posisinya **lebih rendah** dari role bot di server.
+Jika tidak, Discord akan menolak permintaan dengan error `Forbidden`.
+
+**Setup yang benar:**
+```
+Server Roles (urutan atas = tertinggi):
+├── Admin
+├── Mod
+├── Celestial          ← role bot harus di sini (di atas semua role yang mau di-assign)
+├── DAWNSEEKER         ← guild role
+├── Covenants          ← guild role
+├── Member
+└── @everyone
+```
+
+**Gejala jika salah:** Log bot menampilkan:
+```
+[roles] Bot tidak punya permission untuk assign override role <nama_role>
+```
+
+**Fix:** Di Discord server settings → Roles → drag role bot ke posisi lebih tinggi
+dari semua guild role yang di-mapping via `/set-guild`.
 
 ---
 
@@ -168,7 +249,7 @@ Bot kirim embed ke #approval-request
     │   DB: UPDATE status='approved'
     │   assign_role(user)
     │   update_guild_list_channel()
-    │   notify user (ephemeral/DM)
+    │   DM user: "✅ Akun {nickname} ({server}) kamu telah di-approve!"
     │
     └─ Admin klik Reject
             │
@@ -193,32 +274,50 @@ Reply ke user: "Registrasi berhasil!"
 
 ## Guild List Channel Format
 
+Bot mengirim **multiple pesan** di `#guild-list` — 1 pesan per 8 guild (`GUILDS_PER_PAGE = 8`).
+Setiap pesan di-edit (bukan kirim baru) menggunakan tabel `guild_list_pages`.
+
+**Format per guild (embed field):**
 ```
-🏰 amateurs  [Casual]
-"Deskripsi guild..."
-Level: 20  │  Server: Asia · E7
-Members (3): Ruiza, Player2, Player3
+Field name  : 🏰 {guild_name} ({N} member)
+Field value : *{tipe} · Lv.{level} · {keterangan}*    ← baris header (jika ada)
+              Nickname1 @mention Server  ·  Nickname2 @mention Server  ·  ...
+```
 
-🏰 virtue  [Competitive]
-"Deskripsi guild..."
-Level: 45  │  Server: Asia · E7
-Members (2): Plattt, Player4
+Member dipisah dengan `  ·  ` (horizontal), bukan newline. Wrap ke baris bawah hanya jika baris penuh.
 
-──────────────────────────────────────
-✦ Celestial · Terakhir diperbarui: [timestamp]
-Total guild: 2 · Total member: 5
+**Pesan pertama:** title `"✦ Daftar Guild — Celestial Server"`
+**Pesan lanjutan:** title `"✦ Daftar Guild — (lanjutan)"`
+**Footer** (hanya di pesan terakhir): `"Total member terdaftar: N"`
+
+**Contoh tampilan:**
+```
+🏰 amateurs (3 member)
+*Casual · Lv.20 · Guild untuk pemula*
+Ruiza @123 Asia  ·  Player2 @456 Asia  ·  Player3 @789 Global
+
+🏰 virtue (2 member)
+*Kompetitif · Lv.45*
+Plattt @321 Asia  ·  Player4 @654 Asia
+
+👤 Tanpa Guild
+FreeAgent @111 Global  ·  Wanderer @222 Korea
+
+Total member terdaftar: 6
 ```
 
 ---
 
 ## Auto-update Guild List Triggers
 
+Setiap trigger menyebabkan bot **edit semua pesan** guild list yang ada (atau kirim baru jika belum ada).
+
 | Event | Auto-update? |
 |---|---|
 | User register (approved) | ✅ Ya |
 | User unregister | ✅ Ya |
 | Admin `/guild-set-info` | ✅ Ya |
-| Admin `/guild-info` | ✅ Ya (force refresh) |
+| Admin `/guild-info` | ✅ Ya (force refresh semua halaman) |
 | User `/edit` (re-approved) | ✅ Ya |
 
 ---
@@ -235,10 +334,37 @@ Event: `on_member_join(member)` — otomatis dipanggil setiap kali member baru j
 ```
 Author : avatar + username member baru
 Title  : 👋 Selamat datang, @username!
-Body   : Mention user + teks selamat datang + instruksi baca #rules
+Body   : Mention user + teks selamat datang + instruksi baca #rules (link via `RULES_CHANNEL_ID`)
 Footer : ✦ Celestial · Selamat bergabung!
 Color  : Biru (info)
 ```
+
+---
+
+## Member List Channel
+
+### Setup
+Admin jalankan `/setup-profile` di channel yang diinginkan → bot kirim daftar member ke channel tersebut.
+
+### Embed Format
+
+**Per baris:**
+```
+⚔️ **{nickname}** (<@{discord_id}>) · {guild atau "—"} · {server}
+```
+
+**Multi-pesan (100+ member):**
+- Setiap pesan berisi maksimal 20 member
+- Pesan pertama: title `🌌 Daftar Member Celestial`
+- Pesan lanjutan: title `🌌 Daftar Member Celestial (lanjutan)`
+- Footer hanya di pesan terakhir: `Total member: N`
+
+### Storage
+- Menggunakan `guild_list_pages` table dengan key `member_{channel_id}` (namespace terpisah dari guild list)
+- Setiap update: edit pesan yang ada, kirim baru jika belum ada, hapus otomatis jika jumlah halaman berkurang
+
+### Auto-update Triggers
+Sama dengan guild list: approve, unregister, admin unregister, `/profile-list` (force refresh).
 
 ---
 
@@ -270,15 +396,21 @@ Bot assign role "Member" ke user
     │
     ▼
 Channel #register-here & #other-games unlock
-(permission Discord: hanya visible untuk role "Member")
+(set_permissions: view_channel=True, send_messages=True untuk role "Member")
+    │
+    ▼
+Bot kirim DM ke user dengan <#channel_id> clickable link
 ```
 
 **Catatan setup manual di Discord:**
 1. Buat role `Member`
 2. Set permission `#register-here` dan `#other-games` → hanya visible ke role `Member`
-3. Channel mention di embed menggunakan `<#CHANNEL_ID>` (dikonfigurasi via env var)
+3. Jalankan `/setup-register-here` di `#register-here` dan `/setup-other-games` di `#other-games`
 
 ### Channel Mentions di Embed
-- `REGISTER_CHANNEL_ID` → `<#channel_id>` di teks rules
-- `PILIH_ROLES_CHANNEL_ID` → `<#channel_id>` di teks rules
+- Rules embed menggunakan **plain text nama channel** (`absensi`, `pilih-role`) — bukan `<#id>` mention
+  → Menghindari "#No Access" display di Discord mobile
+- Setelah react ✅, bot kirim **DM ke user** dengan `<#channel_id>` clickable link
+  → DM dikirim SETELAH permissions aktif → link tampil accessible di mobile maupun desktop
+- Jika user menonaktifkan DM: log debug saja, tidak error
 

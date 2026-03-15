@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celestial Bot — Setup Guide</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'gg sans', 'Noto Sans', Whitney, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #1e1f22;
+      color: #dcddde;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* ── Header ── */
+    .flow-header {
+      background: #2b2d31;
+      border-bottom: 1px solid #1a1b1e;
+      padding: 20px 32px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #f2f3f5;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .flow-header span {
+      font-size: 13px;
+      font-weight: 400;
+      color: #949ba4;
+      margin-left: 4px;
+    }
+
+    /* ── Nav ── */
+    .flow-nav {
+      background: #2b2d31;
+      border-bottom: 1px solid #1a1b1e;
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      position: sticky;
+      top: 61px;
+      z-index: 9;
+    }
+
+    .flow-nav a {
+      display: inline-block;
+      padding: 12px 16px;
+      color: #949ba4;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .flow-nav a:hover { color: #dcddde; }
+
+    .flow-nav a.active {
+      color: #f2f3f5;
+      border-bottom-color: #5865f2;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Sections ── */
+    section {
+      margin-bottom: 72px;
+      scroll-margin-top: 120px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      color: #949ba4;
+      font-size: 13px;
+      margin-bottom: 32px;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid #2b2d31;
+      margin-bottom: 32px;
+    }
+
+    .subsection {
+      margin-bottom: 36px;
+    }
+
+    .subsection-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Tables ── */
+    .table-wrap {
+      background: #2b2d31;
+      border-radius: 8px;
+      overflow: hidden;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    .setup-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .setup-table th {
+      background: #232428;
+      color: #949ba4;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #1a1b1e;
+      white-space: nowrap;
+    }
+
+    .setup-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #2e3035;
+      vertical-align: top;
+      color: #dcddde;
+    }
+
+    .setup-table tr:last-child td { border-bottom: none; }
+    .setup-table tr:hover td { background: #2e3035; }
+
+    .group-row td {
+      background: #1e2a4a;
+      color: #7289da;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 6px 14px;
+      border-bottom: 1px solid #2e3035;
+    }
+
+    .group-row:hover td { background: #1e2a4a !important; }
+
+    /* ── Command chip ── */
+    .cmd {
+      display: inline-block;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      background: #111214;
+      border: 1px solid #3f4147;
+      border-radius: 3px;
+      padding: 1px 6px;
+      color: #b9bbbe;
+    }
+
+    /* ── Code block ── */
+    .code-block {
+      background: #111214;
+      border: 1px solid #3f4147;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      color: #b9bbbe;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    /* ── Callout boxes ── */
+    .callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .callout-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+    .callout-red {
+      background: #3d1a1a;
+      border-left: 3px solid #f23f43;
+      color: #f38183;
+    }
+
+    .callout-yellow {
+      background: #3d3117;
+      border-left: 3px solid #f0b132;
+      color: #f9d77a;
+    }
+
+    .callout-green {
+      background: #1a3d2b;
+      border-left: 3px solid #23a559;
+      color: #79cf8e;
+    }
+
+    .callout-blue {
+      background: #1e2a4a;
+      border-left: 3px solid #5865f2;
+      color: #8b9cf8;
+    }
+
+    /* ── Phase list ── */
+    .phase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 28px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .phase-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 20px;
+      background: #2b2d31;
+      border-bottom: 1px solid #1e1f22;
+    }
+
+    .phase-item:last-child { border-bottom: none; }
+
+    .phase-num {
+      width: 28px;
+      height: 28px;
+      background: #5865f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .phase-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 3px;
+    }
+
+    .phase-desc { font-size: 12px; color: #949ba4; }
+
+    /* ── Mode cards ── */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .mode-card {
+      background: #2b2d31;
+      border: 1px solid #3f4147;
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .mode-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-card-manual .mode-card-title { color: #f0b132; }
+    .mode-card-auto .mode-card-title { color: #23a559; }
+
+    .mode-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .mode-list li {
+      font-size: 12px;
+      color: #b5bac1;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      line-height: 1.5;
+    }
+
+    .mode-list li span { flex-shrink: 0; }
+
+    /* ── Role hierarchy ── */
+    .role-hierarchy-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .role-hierarchy {
+      background: #232428;
+      border: 1px solid #3f4147;
+      border-radius: 8px;
+      overflow: hidden;
+      min-width: 260px;
+    }
+
+    .role-hierarchy-header {
+      background: #1a1b1e;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #949ba4;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .role-item {
+      padding: 9px 14px;
+      border-bottom: 1px solid #2e3035;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #dcddde;
+    }
+
+    .role-item:last-child { border-bottom: none; }
+
+    .role-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .role-item-admin { color: #f2f3f5; font-weight: 500; }
+    .role-item-mod { color: #f2f3f5; }
+
+    .role-item-bot {
+      background: #1e2a4a;
+      border-left: 3px solid #5865f2;
+      color: #8b9cf8;
+      font-weight: 700;
+      padding-left: 11px;
+    }
+
+    .role-item-guild {
+      background: #1a3d2b;
+      color: #79cf8e;
+      padding-left: 11px;
+    }
+
+    .role-item-member { color: #b5bac1; }
+    .role-item-everyone { color: #949ba4; font-style: italic; }
+
+    .role-tag {
+      font-size: 10px;
+      background: #1e2a4a;
+      color: #7289da;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    /* ── Step cards ── */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-card {
+      background: #2b2d31;
+      border: 1px solid #3f4147;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 18px;
+      background: #232428;
+      border-bottom: 1px solid #1e1f22;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      background: #5865f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f2f3f5;
+      flex: 1;
+    }
+
+    .step-body { padding: 16px 18px; }
+
+    .step-desc {
+      font-size: 13px;
+      color: #b5bac1;
+      margin-bottom: 10px;
+      line-height: 1.55;
+    }
+
+    .step-desc:last-child { margin-bottom: 0; }
+
+    .step-example {
+      font-size: 12px;
+      color: #949ba4;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #1e1f22;
+      border-radius: 4px;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .step-flow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      background: #1e1f22;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .step-flow-item {
+      font-size: 12px;
+      color: #8b9cf8;
+      background: #1e2a4a;
+      border: 1px solid #3a4070;
+      border-radius: 4px;
+      padding: 4px 10px;
+    }
+
+    .step-flow-arrow { color: #4e5058; font-size: 12px; }
+
+    /* ── Extras box ── */
+    .extras-box {
+      background: #232428;
+      border: 1px solid #3f4147;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-top: 20px;
+    }
+
+    .extras-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #949ba4;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+
+    .extras-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 12px;
+      color: #b5bac1;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .extras-item:last-child { margin-bottom: 0; }
+
+    /* ── Checklist ── */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 18px;
+      background: #2b2d31;
+      border-bottom: 1px solid #1e1f22;
+      font-size: 13px;
+      color: #b5bac1;
+      line-height: 1.5;
+    }
+
+    .checklist-item:last-child { border-bottom: none; }
+    .check-icon { color: #23a559; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Tab toggle ── */
+    .tab-container { margin-bottom: 24px; }
+
+    .tab-buttons {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #3f4147;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #949ba4;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -1px;
+    }
+
+    .tab-btn:hover { color: #dcddde; }
+
+    .tab-btn.active {
+      color: #f2f3f5;
+      border-bottom-color: #5865f2;
+    }
+
+    .tab-panel { display: none; padding-top: 20px; }
+    .tab-panel.active { display: block; }
+
+    /* ── Badges & status ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-blue  { background: #1e2a4a; color: #7289da; }
+    .badge-green { background: #1a3d2b; color: #3ba55c; }
+    .badge-red   { background: #3d1a1a; color: #ed4245; }
+    .badge-gray  { background: #2e3035; color: #949ba4; }
+
+    .status-yes  { color: #23a559; font-weight: 600; }
+    .status-no   { color: #f23f43; }
+    .status-note { color: #f0b132; }
+    .status-opt  { color: #949ba4; }
+
+    .opt-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #949ba4;
+      border: 1px solid #4e5058;
+      border-radius: 3px;
+      padding: 1px 5px;
+      white-space: nowrap;
+    }
+
+    /* ── ID tip box ── */
+    .tip-box {
+      background: #232428;
+      border: 1px solid #3f4147;
+      border-radius: 8px;
+      padding: 16px 18px;
+      font-size: 13px;
+      color: #b5bac1;
+    }
+
+    .tip-box-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #5865f2;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tip-box ol {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tip-box li { font-size: 12px; line-height: 1.55; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .flow-header {
+        padding: 16px;
+        font-size: 16px;
+      }
+
+      .flow-nav {
+        top: 53px;
+        padding: 0 16px;
+      }
+
+      .flow-nav a {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+
+      .page {
+        padding: 24px 16px 60px;
+      }
+
+      section {
+        scroll-margin-top: 108px;
+        margin-bottom: 52px;
+      }
+
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .role-hierarchy {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .step-flow {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .step-flow-arrow { transform: rotate(90deg); }
+
+      .setup-table { font-size: 12px; }
+      .setup-table th, .setup-table td { padding: 8px 10px; }
+
+      .code-block { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="flow-header">
+  ✦ Celestial Bot <span>— Setup Guide</span>
+</div>
+
+<!-- ── Nav ── -->
+<div class="flow-nav">
+  <a href="#overview" class="active">📋 Overview</a>
+  <a href="#discord-setup">🔧 Discord Setup</a>
+  <a href="#environment">⚙️ Environment</a>
+  <a href="#jalankan-bot">🚀 Jalankan Bot</a>
+  <a href="#admin-commands">🛡️ Admin Commands</a>
+  <a href="#verifikasi">✅ Verifikasi</a>
+</div>
+
+<div class="page">
+
+  <!-- ════════════════════════════════════════════
+       SECTION 1 — Overview
+  ════════════════════════════════════════════ -->
+  <section id="overview">
+    <div class="section-title">📋 Overview</div>
+    <div class="section-desc">Ringkasan bot, tech stack, dan urutan setup dari awal hingga siap digunakan.</div>
+    <hr class="section-divider">
+
+    <!-- Bot Description -->
+    <p style="font-size:13px;color:#b5bac1;margin-bottom:24px;line-height:1.6">
+      <strong style="color:#f2f3f5">Celestial</strong> adalah Discord bot untuk manajemen guild game Epic Seven —
+      mengelola registrasi member, assignment role otomatis, dan menampilkan informasi guild secara real-time.
+      Bot beroperasi dengan slash commands dan modal form, mendukung dua mode approval: manual dan otomatis.
+    </p>
+
+    <!-- Tech Stack -->
+    <div class="subsection">
+      <div class="subsection-title">🔩 Tech Stack</div>
+      <div class="table-wrap">
+        <table class="setup-table">
+          <thead>
+            <tr>
+              <th>Komponen</th>
+              <th>Teknologi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Language</td><td>Python 3.11+</td></tr>
+            <tr><td>Framework</td><td>discord.py 2.x (app_commands)</td></tr>
+            <tr><td>Database</td><td>SQLite via <span class="cmd">aiosqlite</span></td></tr>
+            <tr><td>Config</td><td>python-dotenv (<span class="cmd">.env</span>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5-Phase Checklist -->
+    <div class="subsection">
+      <div class="subsection-title">📌 Urutan Setup (5 Fase)</div>
+      <div class="phase-list">
+        <div class="phase-item">
+          <div class="phase-num">1</div>
+          <div>
+            <div class="phase-title">Discord Setup</div>
+            <div class="phase-desc">Buat roles, channels, dan atur permissions di Discord server</div>
+          </div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-num">2</div>
+          <div>
+            <div class="phase-title">Env Config</div>
+            <div class="phase-desc">Copy <span class="cmd">.env.example</span> ke <span class="cmd">.env</span>, isi token + semua channel/role IDs</div>
+          </div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-num">3</div>
+          <div>
+            <div class="phase-title">Jalankan Bot</div>
+            <div class="phase-desc">Start bot via Python langsung atau Docker Compose</div>
+          </div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-num">4</div>
+          <div>
+            <div class="phase-title">Admin Commands</div>
+            <div class="phase-desc">Jalankan setup commands berurutan: guild mapping, rules, register embed, member list</div>
+          </div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-num">5</div>
+          <div>
+            <div class="phase-title">Testing</div>
+            <div class="phase-desc">Verifikasi semua flow berjalan normal dari join server hingga role assignment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approval Mode -->
+    <div class="subsection">
+      <div class="subsection-title">🔀 Approval Mode</div>
+      <p style="font-size:12px;color:#949ba4;margin-bottom:14px">
+        Dikonfigurasi via env var <span class="cmd">APPROVAL_MODE</span>. Pilih satu mode sebelum menjalankan bot.
+      </p>
+      <div class="mode-grid">
+        <div class="mode-card mode-card-manual">
+          <div class="mode-card-title">
+            <span>⏳</span> manual
+          </div>
+          <ul class="mode-list">
+            <li><span>•</span> Setelah <span class="cmd">/register</span>, akun masuk status <em>pending</em></li>
+            <li><span>•</span> Bot kirim embed ke <span class="cmd">#approval-request</span></li>
+            <li><span>•</span> Admin klik ✅ Approve atau ❌ Reject</li>
+            <li><span>•</span> Cocok untuk server yang ingin kontrol ketat</li>
+          </ul>
+        </div>
+        <div class="mode-card mode-card-auto">
+          <div class="mode-card-title">
+            <span>⚡</span> auto
+          </div>
+          <ul class="mode-list">
+            <li><span>•</span> Setelah <span class="cmd">/register</span>, akun langsung <em>approved</em></li>
+            <li><span>•</span> Role langsung di-assign tanpa perlu admin</li>
+            <li><span>•</span> Guild list langsung ter-update</li>
+            <li><span>•</span> Cocok untuk server yang ingin proses cepat</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 2 — Discord Setup
+  ════════════════════════════════════════════ -->
+  <section id="discord-setup">
+    <div class="section-title">🔧 Discord Setup</div>
+    <div class="section-desc">Konfigurasi yang perlu dilakukan di Discord server sebelum menjalankan bot.</div>
+    <hr class="section-divider">
+
+    <!-- 2a: Roles -->
+    <div class="subsection">
+      <div class="subsection-title">2a — Roles yang Perlu Dibuat</div>
+      <div class="table-wrap">
+        <table class="setup-table">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Tujuan</th>
+              <th>Env Var</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Celestial</strong> <span class="badge badge-blue">bot</span></td>
+              <td>Role milik bot — harus berada di posisi tertinggi di antara role yang di-manage bot</td>
+              <td><span style="color:#4e5058">—</span></td>
+            </tr>
+            <tr>
+              <td><strong>Member</strong></td>
+              <td>Di-assign otomatis saat user react ✅ di <span class="cmd">#rules</span></td>
+              <td><span class="cmd">MEMBER_ROLE_ID</span></td>
+            </tr>
+            <tr>
+              <td><strong>Default</strong> <span class="opt-label">opsional</span></td>
+              <td>Role fallback — di-assign ke semua user yang akunnya di-approve (jika dikonfigurasi)</td>
+              <td><span class="cmd">DEFAULT_ROLE_ID</span></td>
+            </tr>
+            <tr>
+              <td><strong>[Nama Guild]</strong> <span class="badge badge-green">×N</span></td>
+              <td>Satu role per guild — di-assign saat akun user di-approve. Nama role = nama guild</td>
+              <td>via <span class="cmd">/set-guild</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2b: Role Hierarchy -->
+    <div class="subsection">
+      <div class="subsection-title">2b — Role Hierarchy <span class="badge badge-red">CRITICAL</span></div>
+      <p style="font-size:13px;color:#b5bac1;margin-bottom:16px;line-height:1.55">
+        Bot hanya bisa assign role yang posisinya <strong style="color:#f2f3f5">lebih rendah</strong> dari role bot di server.
+        Drag role <strong>Celestial</strong> ke posisi di atas semua guild role yang di-manage.
+      </p>
+
+      <div class="role-hierarchy-wrap">
+        <div class="role-hierarchy">
+          <div class="role-hierarchy-header">Server Roles — urutan atas = tertinggi</div>
+          <div class="role-item role-item-admin">
+            <div class="role-dot" style="background:#f2f3f5"></div>
+            Admin
+          </div>
+          <div class="role-item role-item-mod">
+            <div class="role-dot" style="background:#f0b132"></div>
+            Mod
+          </div>
+          <div class="role-item role-item-bot">
+            <div class="role-dot" style="background:#5865f2"></div>
+            Celestial
+            <span class="role-tag">BOT</span>
+          </div>
+          <div class="role-item role-item-guild">
+            <div class="role-dot" style="background:#3ba55c"></div>
+            DAWNSEEKER
+          </div>
+          <div class="role-item role-item-guild">
+            <div class="role-dot" style="background:#3ba55c"></div>
+            Covenants
+          </div>
+          <div class="role-item role-item-member">
+            <div class="role-dot" style="background:#b5bac1"></div>
+            Member
+          </div>
+          <div class="role-item role-item-everyone">
+            <div class="role-dot" style="background:#4e5058"></div>
+            @everyone
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-red">
+        <span class="callout-icon">❌</span>
+        <div>
+          <strong>Jika bot tidak di atas guild roles</strong>, Discord menolak request dengan error
+          <span class="cmd" style="color:#f38183">Forbidden</span>.
+          Log bot akan menampilkan: <em style="color:#f9d77a">"Bot tidak punya permission untuk assign override role &lt;nama_role&gt;"</em>
+          <br><br>
+          <strong>Fix:</strong> Discord server settings → Roles → drag role <em>Celestial</em> ke atas semua guild role.
+        </div>
+      </div>
+    </div>
+
+    <!-- 2c: Channels -->
+    <div class="subsection">
+      <div class="subsection-title">2c — Channels yang Perlu Dibuat</div>
+      <div class="table-wrap">
+        <table class="setup-table">
+          <thead>
+            <tr>
+              <th>Channel</th>
+              <th>Tujuan</th>
+              <th>Env Var</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cmd">#welcome</span></td>
+              <td>Bot kirim embed welcome otomatis saat member baru join (<span class="cmd">on_member_join</span>)</td>
+              <td><span class="cmd">WELCOME_CHANNEL_ID</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#rules</span></td>
+              <td>Tempat post embed rules + react ✅ untuk unlock channel</td>
+              <td><span class="cmd">RULES_CHANNEL_ID</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#register-here</span></td>
+              <td>Embed "Daftar Sekarang" + button untuk membuka modal register</td>
+              <td><span class="cmd">REGISTER_CHANNEL_ID</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#other-games</span></td>
+              <td>Channel game lain — unlock otomatis setelah user react ✅ di rules</td>
+              <td><span class="cmd">OTHER_GAMES_CHANNEL_ID</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#guild-list</span></td>
+              <td>Daftar guild + member — auto-update setiap kali ada perubahan. Bisa berisi beberapa pesan jika guild &gt; 8</td>
+              <td><span class="cmd">GUILD_LIST_CHANNEL_ID</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#approval-request</span></td>
+              <td>Queue approval — bot post embed dengan tombol Approve/Reject (manual mode)</td>
+              <td><span class="cmd">APPROVAL_CHANNEL_ID</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#member-list</span> <span class="opt-label">opsional</span></td>
+              <td>Daftar member terdaftar — auto-update. Setup via <span class="cmd">/setup-profile</span></td>
+              <td>via <span class="cmd">/setup-profile</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2d: Permissions -->
+    <div class="subsection">
+      <div class="subsection-title">2d — Channel Permissions</div>
+      <p style="font-size:13px;color:#b5bac1;margin-bottom:14px;line-height:1.55">
+        Atur permissions agar <strong>#register-here</strong> dan <strong>#other-games</strong> hanya terlihat
+        setelah user mendapat role <strong>Member</strong> (via react ✅ di rules).
+      </p>
+      <div class="table-wrap">
+        <table class="setup-table">
+          <thead>
+            <tr>
+              <th>Channel</th>
+              <th>@everyone</th>
+              <th>Member</th>
+              <th>Catatan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cmd">#welcome</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td style="color:#949ba4;font-size:12px">Visible saat user baru join</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#rules</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td style="color:#949ba4;font-size:12px">Harus visible sebelum react</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#register-here</span></td>
+              <td><span class="status-no">❌ Hidden</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td style="color:#949ba4;font-size:12px">Unlock setelah react ✅</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#other-games</span></td>
+              <td><span class="status-no">❌ Hidden</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td style="color:#949ba4;font-size:12px">Unlock setelah react ✅</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#guild-list</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td style="color:#949ba4;font-size:12px">Info publik guild</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#approval-request</span></td>
+              <td><span class="status-no">❌ Hidden</span></td>
+              <td><span class="status-no">❌ Hidden</span></td>
+              <td style="color:#949ba4;font-size:12px">Admin/Mod only</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">#member-list</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td><span class="status-yes">✅ View</span></td>
+              <td style="color:#949ba4;font-size:12px">Info publik member</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-yellow">
+        <span class="callout-icon">⚠️</span>
+        <div>
+          Deny <strong>@everyone</strong> dari melihat <span class="cmd">#register-here</span> dan <span class="cmd">#other-games</span>,
+          lalu Allow role <strong>Member</strong> untuk kedua channel tersebut.
+          Bot akan assign role Member secara otomatis saat user react ✅ di pesan rules.
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 3 — Environment Variables
+  ════════════════════════════════════════════ -->
+  <section id="environment">
+    <div class="section-title">⚙️ Environment Variables</div>
+    <div class="section-desc">Konfigurasi semua token, channel IDs, dan role IDs di file <span class="cmd">.env</span>.</div>
+    <hr class="section-divider">
+
+    <!-- Copy instruction -->
+    <div class="subsection">
+      <div class="subsection-title">1. Copy file template</div>
+      <div class="code-block">cp .env.example .env
+# Edit .env dengan nilai yang sesuai</div>
+      <div class="callout callout-yellow">
+        <span class="callout-icon">⚠️</span>
+        Jangan commit file <span class="cmd">.env</span> ke git. File ini berisi token rahasia bot.
+        File <span class="cmd">.env.example</span> sudah ada di <span class="cmd">.gitignore</span>.
+      </div>
+    </div>
+
+    <!-- Env vars table -->
+    <div class="subsection">
+      <div class="subsection-title">2. Daftar Environment Variables</div>
+      <div class="table-wrap">
+        <table class="setup-table">
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Contoh</th>
+              <th>Wajib</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Token & Server -->
+            <tr class="group-row"><td colspan="4">🔑 Token &amp; Server</td></tr>
+            <tr>
+              <td><span class="cmd">DISCORD_TOKEN</span></td>
+              <td style="color:#949ba4;font-size:12px">MTAw...</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">Token bot dari Discord Developer Portal → Bot → Token</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">GUILD_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID server Discord tempat bot beroperasi</td>
+            </tr>
+
+            <!-- Channels -->
+            <tr class="group-row"><td colspan="4">📢 Channels</td></tr>
+            <tr>
+              <td><span class="cmd">WELCOME_CHANNEL_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID channel <span class="cmd">#welcome</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">RULES_CHANNEL_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID channel <span class="cmd">#rules</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">REGISTER_CHANNEL_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID channel <span class="cmd">#register-here</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">OTHER_GAMES_CHANNEL_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID channel <span class="cmd">#other-games</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">GUILD_LIST_CHANNEL_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID channel <span class="cmd">#guild-list</span></td>
+            </tr>
+            <tr>
+              <td><span class="cmd">APPROVAL_CHANNEL_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-note">⚠️*</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID channel <span class="cmd">#approval-request</span> (*wajib jika <span class="cmd">APPROVAL_MODE=manual</span>)</td>
+            </tr>
+
+            <!-- Config -->
+            <tr class="group-row"><td colspan="4">📌 Config</td></tr>
+            <tr>
+              <td><span class="cmd">RULES_MESSAGE_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-note">⚠️</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID pesan rules untuk deteksi reaksi ✅. Tersimpan otomatis ke DB setelah <span class="cmd">/setup-rules</span></td>
+            </tr>
+
+            <!-- Roles -->
+            <tr class="group-row"><td colspan="4">🎭 Roles</td></tr>
+            <tr>
+              <td><span class="cmd">MEMBER_ROLE_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID role <strong>Member</strong> — di-assign saat user react ✅ di rules</td>
+            </tr>
+            <tr>
+              <td><span class="cmd">DEFAULT_ROLE_ID</span></td>
+              <td style="color:#949ba4;font-size:12px">123456789012</td>
+              <td><span class="status-opt">❌</span></td>
+              <td style="font-size:12px;color:#b5bac1">ID role Default — opsional, fallback role untuk semua user yang di-approve</td>
+            </tr>
+
+            <!-- App Config -->
+            <tr class="group-row"><td colspan="4">🔀 App Config</td></tr>
+            <tr>
+              <td><span class="cmd">APPROVAL_MODE</span></td>
+              <td style="color:#949ba4;font-size:12px">manual</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">Mode approval: <span class="cmd">manual</span> atau <span class="cmd">auto</span></td>
+            </tr>
+
+            <!-- Database -->
+            <tr class="group-row"><td colspan="4">🗄️ Database</td></tr>
+            <tr>
+              <td><span class="cmd">DB_PATH</span></td>
+              <td style="color:#949ba4;font-size:12px">data/celestial.db</td>
+              <td><span class="status-yes">✅</span></td>
+              <td style="font-size:12px;color:#b5bac1">Path file database SQLite. Default: <span class="cmd">data/celestial.db</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- How to get Discord IDs -->
+    <div class="subsection">
+      <div class="subsection-title">3. Cara Mendapatkan Discord IDs</div>
+      <div class="tip-box">
+        <div class="tip-box-title">💡 Aktifkan Developer Mode terlebih dahulu</div>
+        <ol>
+          <li>Buka Discord → <strong>Settings</strong> (⚙️) → <strong>Advanced</strong></li>
+          <li>Toggle <strong>Developer Mode</strong> → ON</li>
+          <li>Kembali ke server — klik kanan pada <strong>channel</strong>, <strong>role</strong>, atau <strong>nama server</strong></li>
+          <li>Pilih <strong>Copy ID</strong> di bagian bawah menu konteks</li>
+          <li>Paste ID tersebut ke nilai env var yang sesuai di <span class="cmd">.env</span></li>
+        </ol>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 4 — Jalankan Bot
+  ════════════════════════════════════════════ -->
+  <section id="jalankan-bot">
+    <div class="section-title">🚀 Jalankan Bot</div>
+    <div class="section-desc">Dua cara menjalankan bot: langsung via Python atau via Docker Compose.</div>
+    <hr class="section-divider">
+
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="python">🐍 Python Langsung</button>
+        <button class="tab-btn" data-tab="docker">🐳 Docker</button>
+      </div>
+
+      <!-- Python tab -->
+      <div class="tab-panel active" data-panel="python">
+        <div class="subsection-title">Install dependencies &amp; jalankan</div>
+        <div class="code-block">pip install -r requirements.txt
+python main.py</div>
+
+        <div class="callout callout-blue">
+          <span class="callout-icon">💡</span>
+          <div>
+            Gunakan virtual environment untuk menghindari konflik package:
+            <br><br>
+            <span class="cmd">python -m venv venv</span> &nbsp;→&nbsp; <span class="cmd">source venv/bin/activate</span> (Linux/Mac)
+            <br>
+            <span class="cmd">python -m venv venv</span> &nbsp;→&nbsp; <span class="cmd">venv\Scripts\activate</span> (Windows)
+          </div>
+        </div>
+
+        <div class="callout callout-green">
+          <span class="callout-icon">✅</span>
+          Bot berhasil start jika log menampilkan: <em style="color:#79cf8e">"Logged in as [NamaBot]#[xxxx]"</em>
+        </div>
+      </div>
+
+      <!-- Docker tab -->
+      <div class="tab-panel" data-panel="docker">
+        <div class="subsection-title">Build &amp; jalankan container</div>
+        <div class="code-block"># Pertama kali (build image + start container)
+docker-compose up --build -d
+
+# Selanjutnya (start tanpa rebuild)
+docker-compose up -d
+
+# Lihat log secara realtime
+docker-compose logs -f
+
+# Stop bot
+docker-compose down</div>
+
+        <div class="callout callout-yellow">
+          <span class="callout-icon">⚠️</span>
+          <div>
+            Pastikan file <span class="cmd">.env</span> sudah diisi sebelum menjalankan Docker.
+            Container membaca env vars dari file <span class="cmd">.env</span> secara otomatis.
+          </div>
+        </div>
+
+        <div class="callout callout-blue">
+          <span class="callout-icon">💡</span>
+          Database SQLite tersimpan di <span class="cmd">./data/</span> yang di-mount sebagai Docker volume.
+          Data tidak hilang saat container restart atau rebuild.
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 5 — Admin Commands
+  ════════════════════════════════════════════ -->
+  <section id="admin-commands">
+    <div class="section-title">🛡️ Admin Commands</div>
+    <div class="section-desc">Jalankan commands ini <strong style="color:#f2f3f5">berurutan</strong> setelah bot online dan terhubung ke server.</div>
+    <hr class="section-divider">
+
+    <div class="step-list">
+
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <div class="step-title">Mapping Guild Roles — <span class="cmd">/set-guild</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Buat mapping antara nama guild dan Discord role. Bot akan assign role ini ke user yang
+            terdaftar di guild tersebut saat akun di-approve.
+          </p>
+          <p class="step-desc" style="color:#949ba4;font-size:12px">
+            ⚠️ Nama role Discord harus sama persis dengan nama guild yang dimasukkan user saat register.
+          </p>
+          <div class="step-example">
+            <span style="color:#5865f2">Contoh:</span>
+            <span><span class="cmd">/set-guild @Covenants</span> — mapping guild "Covenants" ke role @Covenants</span>
+          </div>
+          <div class="step-example">
+            <span style="color:#949ba4">Ulangi:</span>
+            <span>Jalankan command ini untuk setiap guild yang ada di server</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <div class="step-title">Set Info Guild — <span class="cmd">/guild-set-info</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Isi informasi detail tiap guild: tipe kompetisi, level, dan keterangan.
+            Informasi ini ditampilkan di <span class="cmd">#guild-list</span>.
+          </p>
+          <div class="step-flow">
+            <span class="step-flow-item">Jalankan /guild-set-info</span>
+            <span class="step-flow-arrow">→</span>
+            <span class="step-flow-item">Dropdown: pilih guild</span>
+            <span class="step-flow-arrow">→</span>
+            <span class="step-flow-item">Dropdown: pilih tipe</span>
+            <span class="step-flow-arrow">→</span>
+            <span class="step-flow-item">Modal: isi level + keterangan</span>
+            <span class="step-flow-arrow">→</span>
+            <span class="step-flow-item">Guild list auto-update</span>
+          </div>
+          <div class="step-example" style="margin-top:12px">
+            <span style="color:#5865f2">Tipe guild:</span>
+            <span>
+              <span class="cmd">casual</span> &nbsp;·&nbsp;
+              <span class="cmd">semi_compe</span> &nbsp;·&nbsp;
+              <span class="cmd">compe</span>
+            </span>
+          </div>
+          <div class="step-example">
+            <span style="color:#949ba4">Ulangi:</span>
+            <span>Jalankan untuk setiap guild yang sudah di-mapping di Step 1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <div class="step-title">Post Rules Embed — <span class="cmd">/setup-rules</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Jalankan command ini <strong style="color:#f2f3f5">di dalam channel <span class="cmd">#rules</span></strong>.
+            Bot akan memposting embed rules lengkap dengan tombol react ✅.
+          </p>
+          <p class="step-desc" style="color:#949ba4;font-size:12px">
+            Message ID tersimpan otomatis ke database. Bot menggunakan ID ini untuk mendeteksi
+            reaksi ✅ dari member (<span class="cmd">on_raw_reaction_add</span>).
+          </p>
+          <div class="callout callout-yellow" style="margin-bottom:0;margin-top:8px">
+            <span class="callout-icon">⚠️</span>
+            Jalankan hanya satu kali. Jika dijalankan ulang, bot akan memposting embed baru dan
+            Message ID lama tidak akan aktif untuk deteksi reaksi.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">4</div>
+          <div class="step-title">Post Register Embed — <span class="cmd">/setup-register</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Jalankan command ini <strong style="color:#f2f3f5">di dalam channel <span class="cmd">#register-here</span></strong>.
+            Bot akan memposting embed dengan tombol "Daftar Sekarang" yang membuka modal register.
+          </p>
+          <p class="step-desc" style="color:#949ba4;font-size:12px">
+            User yang sudah punya role Member (setelah react ✅ di rules) dapat mengklik tombol ini
+            untuk memulai proses registrasi akun game.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">5</div>
+          <div class="step-title">Set Member List Channel — <span class="cmd">/setup-profile</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Jalankan command ini <strong style="color:#f2f3f5">di dalam channel yang ingin dijadikan member list</strong>
+            (biasanya <span class="cmd">#member-list</span>).
+            Bot akan memposting embed daftar member terdaftar yang auto-update.
+          </p>
+          <p class="step-desc" style="color:#949ba4;font-size:12px">
+            Step ini opsional — jalankan jika server ingin menampilkan daftar member secara publik.
+            Channel yang dipilih akan menjadi channel member list permanen.
+          </p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">6</div>
+          <div class="step-title">Set Welcome Channel — <span class="cmd">/setup-welcome</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Jalankan command ini <strong style="color:#f2f3f5">di dalam channel welcome</strong>
+            (biasanya <span class="cmd">#welcome</span>).
+            Bot akan menyimpan channel tersebut sebagai tujuan pesan selamat datang anggota baru.
+          </p>
+          <p class="step-desc" style="color:#949ba4;font-size:12px">
+            Step ini opsional — jika tidak diset (dan <span class="cmd">WELCOME_CHANNEL_ID</span> di <code>.env</code> kosong),
+            bot tidak akan mengirim pesan welcome saat member baru bergabung.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+      <!-- Step 7 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">7</div>
+          <div class="step-title">Set Register Channel — <span class="cmd">/setup-register-here</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Jalankan command ini <strong style="color:#f2f3f5">di dalam channel <span class="cmd">#register-here</span></strong>.
+            Bot menyimpan channel tersebut sebagai register channel yang di-unlock otomatis setelah user react ✅ di rules.
+          </p>
+          <p class="step-desc" style="color:#949ba4;font-size:12px">
+            Opsional — bisa juga diset via env var <span class="cmd">REGISTER_CHANNEL_ID</span>.
+            Jika diset via command, nilai di DB akan override env var.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">8</div>
+          <div class="step-title">Set Other Games Channel — <span class="cmd">/setup-other-games</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Jalankan command ini <strong style="color:#f2f3f5">di dalam channel <span class="cmd">#other-games</span></strong>.
+            Bot menyimpan channel tersebut sebagai other-games channel yang di-unlock otomatis setelah user react ✅ di rules.
+          </p>
+          <p class="step-desc" style="color:#949ba4;font-size:12px">
+            Opsional — bisa juga diset via env var <span class="cmd">OTHER_GAMES_CHANNEL_ID</span>.
+            Jika diset via command, nilai di DB akan override env var.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 9 -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">9</div>
+          <div class="step-title">Set Approval Ping — <span class="cmd">/setup-approval-ping @role</span></div>
+        </div>
+        <div class="step-body">
+          <p class="step-desc">
+            Toggle role yang akan di-ping setiap ada approval request baru masuk.
+            Bisa menambahkan <strong style="color:#f2f3f5">lebih dari 1 role</strong> — jalankan command lagi dengan role berbeda untuk menambah,
+            atau jalankan dengan role yang sama untuk menghapus (toggle).
+          </p>
+          <div class="step-example">
+            <span style="color:#5865f2">Contoh:</span>
+            <span>
+              <span class="cmd">/setup-approval-ping @Admin</span> — tambah @Admin ke daftar ping<br>
+              <span class="cmd">/setup-approval-ping @Moderator</span> — tambah @Moderator ke daftar ping<br>
+              <span class="cmd">/setup-approval-ping @Admin</span> — hapus @Admin dari daftar ping (toggle)
+            </span>
+          </div>
+          <p class="step-desc" style="color:#949ba4;font-size:12px;margin-top:10px">
+            Opsional — hanya relevan jika <span class="cmd">APPROVAL_MODE=manual</span>.
+            Jika tidak ada role yang di-setup, approval request tetap dikirim tanpa ping.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Force Refresh -->
+    <div class="extras-box">
+      <div class="extras-title">⚡ Force Refresh &amp; Admin Utilities (opsional)</div>
+      <div class="extras-item">
+        <span class="cmd">/guild-info</span>
+        <span style="color:#949ba4">—</span>
+        <span>Force refresh semua pesan guild list di <span class="cmd">#guild-list</span> secara manual (edit semua halaman sekaligus)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/profile-list</span>
+        <span style="color:#949ba4">—</span>
+        <span>Force refresh embed daftar member di channel member list</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/guild-list</span>
+        <span style="color:#949ba4">—</span>
+        <span>Lihat semua guild yang sudah di-mapping beserta role, tipe, level. Bisa langsung hapus dari dropdown</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/remove-guild</span>
+        <span style="color:#949ba4">—</span>
+        <span>Hapus mapping guild dari database (dropdown pilih guild). Guild list ter-update otomatis</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/admin-unregister @user</span>
+        <span style="color:#949ba4">—</span>
+        <span>Hapus akun game user tertentu tanpa perlu meminta user untuk unregister sendiri</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/bot-status</span>
+        <span style="color:#949ba4">—</span>
+        <span>Lihat uptime, latency, statistik akun, jumlah guild, dan konfigurasi channel aktif</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/help</span>
+        <span style="color:#949ba4">—</span>
+        <span>Lihat daftar semua command bot beserta syntax (bisa dijalankan semua user)</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 6 — Verifikasi
+  ════════════════════════════════════════════ -->
+  <section id="verifikasi">
+    <div class="section-title">✅ Verifikasi</div>
+    <div class="section-desc">Test semua flow ini setelah setup selesai untuk memastikan bot berfungsi normal.</div>
+    <hr class="section-divider">
+
+    <div class="checklist">
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Welcome message</strong> —
+          User baru join server → bot kirim embed welcome di <span class="cmd">#welcome</span> secara otomatis
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">React rules</strong> —
+          User react ✅ di pesan rules → mendapat role <strong>Member</strong>,
+          channel <span class="cmd">#register-here</span> dan <span class="cmd">#other-games</span> menjadi visible
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Modal register</strong> —
+          User klik tombol "Daftar Sekarang" di <span class="cmd">#register-here</span> → modal register terbuka
+          dengan 3 field: Server, Guild (opsional), Nickname
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Submit register</strong> —
+          User submit modal → embed approval muncul di <span class="cmd">#approval-request</span>
+          <span class="badge badge-gray">manual mode</span> atau langsung approved
+          <span class="badge badge-green">auto mode</span>
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Approve &amp; role assignment</strong> —
+          Admin klik ✅ Approve → role guild di-assign ke user, semua pesan di <span class="cmd">#guild-list</span> ter-update otomatis (member tampil horizontal)
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Profile command</strong> —
+          Jalankan <span class="cmd">/profile</span> → embed profil akun user tampil dengan data yang benar
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Admin unregister</strong> —
+          Jalankan <span class="cmd">/admin-unregister @user</span> → akun terhapus dari database,
+          <span class="cmd">#guild-list</span> dan <span class="cmd">#member-list</span> ter-update otomatis
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Approval ping</strong> —
+          Jalankan <span class="cmd">/setup-approval-ping @Admin</span> → user register baru →
+          embed approval di <span class="cmd">#approval-request</span> mention @Admin
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Remove guild</strong> —
+          Jalankan <span class="cmd">/remove-guild</span> → pilih guild → guild terhapus dari database,
+          <span class="cmd">#guild-list</span> ter-update otomatis
+        </span>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+  // ── Sticky nav active highlight on scroll ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.flow-nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // ── Smooth scroll ──
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // ── Tab toggle (Python vs Docker) ──
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const container = btn.closest('.tab-container');
+      const target = btn.dataset.tab;
+      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      container.querySelector(`.tab-panel[data-panel="${target}"]`).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

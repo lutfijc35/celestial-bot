@@ -55,10 +55,15 @@ celestial/
 
 | Command | Deskripsi |
 |---|---|
-| `/set-guild <guild> <@role>` | Mapping nama guild ke Discord role |
-| `/guild-set-info <guild> <level> <tipe> <keterangan>` | Set info guild (level angka, tipe: casual/semi_compe/compe) |
+| `/set-guild <@role>` | Mapping nama guild ke Discord role (nama guild = nama role) |
+| `/guild-set-info` | Pilih guild → pilih tipe → isi level/keterangan via modal |
 | `/guild-info` | Force refresh pesan guild list di channel guild-list |
 | `/setup-rules` | Admin | Post embed rules ke #rules channel (satu kali) |
+| `/setup-profile` | Set channel ini sebagai daftar member auto-update |
+| `/setup-welcome` | Set channel ini sebagai welcome channel (on_member_join) |
+| `/bot-status` | Lihat status bot: uptime, latency, statistik akun, konfigurasi channel |
+| `/profile-list` | Force refresh daftar member |
+| `/admin-unregister @user` | Hapus akun game milik user tertentu (tanpa perlu minta user unregister) |
 
 ## Events (Bot Listeners)
 
@@ -106,9 +111,11 @@ APPROVAL_CHANNEL_ID=channel_id_for_approval
 GUILD_LIST_CHANNEL_ID=channel_id_for_guild_list
 WELCOME_CHANNEL_ID=channel_id_for_welcome
 RULES_MESSAGE_ID=message_id_of_rules_post
+RULES_CHANNEL_ID=channel_id_for_rules
 REGISTER_CHANNEL_ID=channel_id_for_register_here
 OTHER_GAMES_CHANNEL_ID=channel_id_for_other_games
 MEMBER_ROLE_ID=role_id_assigned_after_rules_react
+DEFAULT_ROLE_ID=role_id_assigned_after_approval
 APPROVAL_MODE=manual   # manual | auto
 DB_PATH=data/celestial.db
 ```

@@ -1,0 +1,7 @@
+services:
+  celestial-bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/app/data   # SQLite db persist

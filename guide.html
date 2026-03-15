@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celestial Bot — User Guide</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'gg sans', 'Noto Sans', Whitney, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #1e1f22;
+      color: #dcddde;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* ── Header ── */
+    .flow-header {
+      background: #2b2d31;
+      border-bottom: 1px solid #1a1b1e;
+      padding: 20px 32px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #f2f3f5;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .flow-header span {
+      font-size: 13px;
+      font-weight: 400;
+      color: #949ba4;
+      margin-left: 4px;
+    }
+
+    /* ── Nav ── */
+    .flow-nav {
+      background: #2b2d31;
+      border-bottom: 1px solid #1a1b1e;
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      position: sticky;
+      top: 61px;
+      z-index: 9;
+    }
+
+    .flow-nav a {
+      display: inline-block;
+      padding: 12px 16px;
+      color: #949ba4;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .flow-nav a:hover { color: #dcddde; }
+
+    .flow-nav a.active {
+      color: #f2f3f5;
+      border-bottom-color: #5865f2;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    section {
+      margin-bottom: 72px;
+      scroll-margin-top: 120px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      color: #949ba4;
+      font-size: 13px;
+      margin-bottom: 32px;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid #2b2d31;
+      margin-bottom: 32px;
+    }
+
+    .subsection { margin-bottom: 32px; }
+
+    .subsection-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Command chip ── */
+    .cmd {
+      display: inline-block;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      background: #111214;
+      border: 1px solid #3f4147;
+      border-radius: 3px;
+      padding: 1px 6px;
+      color: #b9bbbe;
+    }
+
+    /* ── Callouts ── */
+    .callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .callout-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+    .callout-green { background: #1a3d2b; border-left: 3px solid #23a559; color: #79cf8e; }
+    .callout-yellow { background: #3d3117; border-left: 3px solid #f0b132; color: #f9d77a; }
+    .callout-blue { background: #1e2a4a; border-left: 3px solid #5865f2; color: #8b9cf8; }
+
+    /* ── Step list ── */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .step-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 20px;
+      background: #2b2d31;
+      border-bottom: 1px solid #1e1f22;
+    }
+
+    .step-row:last-child { border-bottom: none; }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: #5865f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-content { flex: 1; }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 4px;
+    }
+
+    .step-body {
+      font-size: 13px;
+      color: #b5bac1;
+      line-height: 1.55;
+    }
+
+    /* ── Info card ── */
+    .info-card {
+      background: #2b2d31;
+      border: 1px solid #3f4147;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+
+    .info-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-card p {
+      font-size: 13px;
+      color: #b5bac1;
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .info-card p:last-child { margin-bottom: 0; }
+
+    /* ── Modal mockup ── */
+    .modal-mockup {
+      background: #313338;
+      border: 1px solid #1e1f22;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 440px;
+      margin-bottom: 18px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: #949ba4;
+      margin-bottom: 18px;
+    }
+
+    .modal-field { margin-bottom: 14px; }
+    .modal-field:last-child { margin-bottom: 0; }
+
+    .modal-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #b5bac1;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .modal-label .req { color: #f23f43; }
+    .modal-label .opt { color: #949ba4; font-weight: 400; font-size: 10px; text-transform: none; letter-spacing: 0; }
+
+    .modal-input {
+      background: #1e1f22;
+      border: 1px solid #1e1f22;
+      border-radius: 3px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #dcddde;
+      width: 100%;
+    }
+
+    .modal-input.placeholder { color: #949ba4; font-style: italic; }
+
+    /* ── Profile mockup ── */
+    .profile-embed {
+      background: #2b2d31;
+      border-left: 4px solid #5865f2;
+      border-radius: 0 4px 4px 0;
+      padding: 16px 18px;
+      max-width: 420px;
+      margin-bottom: 18px;
+    }
+
+    .embed-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 12px;
+    }
+
+    .embed-field { margin-bottom: 10px; }
+    .embed-field:last-child { margin-bottom: 0; }
+
+    .embed-field-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 3px;
+    }
+
+    .embed-field-value {
+      font-size: 13px;
+      color: #dcddde;
+    }
+
+    .embed-divider {
+      border: none;
+      border-top: 1px solid #3f4147;
+      margin: 12px 0;
+    }
+
+    /* ── Status badge ── */
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-approved { background: #1a3d2b; color: #3ba55c; }
+    .badge-pending { background: #3d3117; color: #faa61a; }
+
+    /* ── Guild list mockup ── */
+    .guild-embed {
+      background: #2b2d31;
+      border-left: 4px solid #5865f2;
+      border-radius: 0 4px 4px 0;
+      padding: 16px 18px;
+      max-width: 560px;
+      margin-bottom: 18px;
+    }
+
+    .guild-field { margin-bottom: 14px; }
+    .guild-field:last-child { margin-bottom: 0; }
+
+    .guild-field-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 5px;
+    }
+
+    .guild-field-header {
+      font-size: 12px;
+      color: #949ba4;
+      font-style: italic;
+      margin-bottom: 4px;
+    }
+
+    .guild-members {
+      font-size: 13px;
+      color: #dcddde;
+      line-height: 1.7;
+    }
+
+    .guild-sep { color: #4e5058; }
+
+    .embed-footer {
+      font-size: 11px;
+      color: #949ba4;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #3f4147;
+    }
+
+    /* ── Two-column grid ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Unlock visual ── */
+    .channel-list {
+      background: #2b2d31;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 220px;
+      margin-bottom: 18px;
+    }
+
+    .channel-list-header {
+      background: #232428;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #949ba4;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .channel-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      color: #949ba4;
+      border-bottom: 1px solid #1e1f22;
+    }
+
+    .channel-item:last-child { border-bottom: none; }
+    .channel-item.visible { color: #dcddde; }
+    .channel-item.locked { opacity: 0.4; }
+
+    .channel-icon { font-size: 14px; }
+    .lock-icon { font-size: 10px; margin-left: auto; color: #f0b132; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .flow-header { padding: 16px; font-size: 16px; }
+      .flow-nav { top: 53px; padding: 0 16px; }
+      .flow-nav a { padding: 10px 12px; font-size: 12px; }
+      .page { padding: 24px 16px 60px; }
+      section { scroll-margin-top: 108px; margin-bottom: 52px; }
+      .two-col { grid-template-columns: 1fr; }
+      .modal-mockup { max-width: 100%; }
+      .guild-embed { max-width: 100%; }
+      .profile-embed { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="flow-header">
+  ✦ Celestial Bot <span>— User Guide</span>
+</div>
+
+<!-- ── Nav ── -->
+<div class="flow-nav">
+  <a href="#mulai" class="active">🎉 Mulai</a>
+  <a href="#register">📝 Register</a>
+  <a href="#profil">👤 Profil</a>
+  <a href="#edit-unregister">✏️ Edit &amp; Unregister</a>
+  <a href="#guild-list">🏰 Guild List</a>
+</div>
+
+<div class="page">
+
+  <!-- ════════════════════════════════════════════
+       SECTION 1 — Mulai
+  ════════════════════════════════════════════ -->
+  <section id="mulai">
+    <div class="section-title">🎉 Mulai</div>
+    <div class="section-desc">Langkah pertama setelah bergabung ke server Celestial.</div>
+    <hr class="section-divider">
+
+    <!-- Step list -->
+    <div class="subsection">
+      <div class="step-list">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Bergabung ke Server</div>
+            <div class="step-body">
+              Bot otomatis kirim embed selamat datang di <span class="cmd">#welcome</span> dengan instruksi langkah berikutnya.
+            </div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Baca Rules di <span class="cmd">#rules</span></div>
+            <div class="step-body">
+              Baca semua aturan server. Setelah selesai, react dengan ✅ pada pesan rules untuk melanjutkan.
+            </div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">React ✅ → Dapat Role Member</div>
+            <div class="step-body">
+              Bot otomatis assign role <strong style="color:#f2f3f5">Member</strong> ke akun Discord kamu.
+              Dua channel baru langsung terbuka.
+            </div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Channel Terbuka</div>
+            <div class="step-body">
+              <span class="cmd">#register-here</span> — tempat daftar akun game<br>
+              <span class="cmd">#other-games</span> — channel untuk game lain
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Channel visual -->
+    <div class="subsection">
+      <div class="subsection-title">Sebelum &amp; Sesudah React ✅</div>
+      <div class="two-col">
+        <div>
+          <p style="font-size:12px;color:#949ba4;margin-bottom:10px">Sebelum react rules:</p>
+          <div class="channel-list">
+            <div class="channel-list-header">Text Channels</div>
+            <div class="channel-item visible"><span class="channel-icon">#</span> welcome</div>
+            <div class="channel-item visible"><span class="channel-icon">#</span> rules</div>
+            <div class="channel-item locked"><span class="channel-icon">#</span> register-here <span class="lock-icon">🔒</span></div>
+            <div class="channel-item locked"><span class="channel-icon">#</span> other-games <span class="lock-icon">🔒</span></div>
+            <div class="channel-item locked"><span class="channel-icon">#</span> guild-list <span class="lock-icon">🔒</span></div>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:12px;color:#23a559;margin-bottom:10px">Setelah react ✅:</p>
+          <div class="channel-list">
+            <div class="channel-list-header">Text Channels</div>
+            <div class="channel-item visible"><span class="channel-icon">#</span> welcome</div>
+            <div class="channel-item visible"><span class="channel-icon">#</span> rules</div>
+            <div class="channel-item visible" style="color:#23a559"><span class="channel-icon">#</span> register-here ✨</div>
+            <div class="channel-item visible" style="color:#23a559"><span class="channel-icon">#</span> other-games ✨</div>
+            <div class="channel-item visible"><span class="channel-icon">#</span> guild-list</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 2 — Register
+  ════════════════════════════════════════════ -->
+  <section id="register">
+    <div class="section-title">📝 Register</div>
+    <div class="section-desc">Cara mendaftarkan akun game Epic Seven kamu ke server.</div>
+    <hr class="section-divider">
+
+    <!-- How to trigger -->
+    <div class="subsection">
+      <div class="subsection-title">Cara Membuka Form Register</div>
+      <div class="step-list">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Buka channel <span class="cmd">#register-here</span></div>
+            <div class="step-body">Channel ini hanya visible setelah kamu sudah react ✅ di rules.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Klik tombol "Daftar Sekarang"</div>
+            <div class="step-body">Bot menampilkan embed dengan tombol biru. Klik tombol tersebut untuk membuka form.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Isi modal form dan submit</div>
+            <div class="step-body">Modal berisi 3 field. Isi dengan data akun game kamu lalu klik Submit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal mockup -->
+    <div class="subsection">
+      <div class="subsection-title">Form Register</div>
+      <div class="modal-mockup">
+        <div class="modal-title">📝 Daftar Akun Game</div>
+        <div class="modal-subtitle">Isi data akun Epic Seven kamu</div>
+
+        <div class="modal-field">
+          <div class="modal-label">
+            Server <span class="req">*</span>
+          </div>
+          <div class="modal-input placeholder">Asia / Global / Korea / Japan / Europe</div>
+        </div>
+
+        <div class="modal-field">
+          <div class="modal-label">
+            Guild <span class="opt">(opsional)</span>
+          </div>
+          <div class="modal-input placeholder">Nama guild — kosongkan jika belum punya guild</div>
+        </div>
+
+        <div class="modal-field">
+          <div class="modal-label">
+            Nickname <span class="req">*</span>
+          </div>
+          <div class="modal-input placeholder">Nickname in-game kamu</div>
+        </div>
+      </div>
+
+      <div class="callout callout-yellow">
+        <span class="callout-icon">⚠️</span>
+        <div>
+          <strong>Nickname harus unik per server.</strong> Kombinasi Nickname + Server tidak boleh sama
+          dengan akun lain yang sudah terdaftar. Nickname boleh sama jika di server yang berbeda.
+        </div>
+      </div>
+    </div>
+
+    <!-- After submit -->
+    <div class="subsection">
+      <div class="subsection-title">Setelah Submit</div>
+      <div class="two-col">
+        <div class="info-card">
+          <div class="info-card-title">⏳ Mode Manual</div>
+          <p>Akunmu masuk status <strong>pending</strong>. Admin akan mereview dan melakukan approve atau reject.</p>
+          <p>Kamu akan dapat notifikasi saat akun di-approve atau di-reject.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title" style="color:#23a559">⚡ Mode Auto</div>
+          <p>Akun langsung <strong>approved</strong> tanpa perlu tunggu admin.</p>
+          <p>Role guild langsung di-assign ke akun Discord kamu.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-blue">
+        <span class="callout-icon">💡</span>
+        Kamu boleh mendaftarkan <strong>lebih dari satu akun</strong> di server yang berbeda
+        (misal: satu akun Asia, satu akun Global).
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 3 — Profil
+  ════════════════════════════════════════════ -->
+  <section id="profil">
+    <div class="section-title">👤 Profil</div>
+    <div class="section-desc">Melihat profil akun game yang sudah terdaftar.</div>
+    <hr class="section-divider">
+
+    <!-- Command info -->
+    <div class="subsection">
+      <div class="info-card">
+        <div class="info-card-title">📌 Commands</div>
+        <p><span class="cmd">/profile</span> — Lihat profil akun kamu sendiri (semua akun, semua status)</p>
+        <p><span class="cmd">/profile @user</span> — Lihat profil member lain (hanya akun dengan status Approved)</p>
+      </div>
+    </div>
+
+    <!-- Profile embed mockup -->
+    <div class="subsection">
+      <div class="subsection-title">Tampilan Profil</div>
+      <div class="profile-embed">
+        <div class="embed-title">🌌 Profile · Dantalian</div>
+        <div class="embed-divider"></div>
+
+        <div class="embed-field">
+          <div class="embed-field-name">⚔️ Akun #1</div>
+          <div class="embed-field-value" style="font-size:12px;color:#b5bac1;line-height:1.8">
+            Nickname &nbsp; │ &nbsp; Ruiza<br>
+            Guild &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │ &nbsp; amateurs<br>
+            Server &nbsp;&nbsp;&nbsp; │ &nbsp; Asia<br>
+            Game &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │ &nbsp; E7<br>
+            Status &nbsp;&nbsp;&nbsp; │ &nbsp; <span class="status-badge badge-approved">✅ Approved</span>
+          </div>
+        </div>
+
+        <div class="embed-divider"></div>
+
+        <div class="embed-field">
+          <div class="embed-field-name">⚔️ Akun #2</div>
+          <div class="embed-field-value" style="font-size:12px;color:#b5bac1;line-height:1.8">
+            Nickname &nbsp; │ &nbsp; Plattt<br>
+            Guild &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │ &nbsp; virtue<br>
+            Server &nbsp;&nbsp;&nbsp; │ &nbsp; Global<br>
+            Game &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │ &nbsp; E7<br>
+            Status &nbsp;&nbsp;&nbsp; │ &nbsp; <span class="status-badge badge-pending">⏳ Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-blue">
+        <span class="callout-icon">💡</span>
+        Saat melihat profil orang lain (<span class="cmd">/profile @user</span>), hanya akun dengan status
+        <strong>Approved</strong> yang ditampilkan. Akun pending atau rejected tidak terlihat.
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 4 — Edit & Unregister
+  ════════════════════════════════════════════ -->
+  <section id="edit-unregister">
+    <div class="section-title">✏️ Edit &amp; Unregister</div>
+    <div class="section-desc">Mengubah data akun atau menghapus pendaftaran.</div>
+    <hr class="section-divider">
+
+    <!-- Edit -->
+    <div class="subsection">
+      <div class="subsection-title">Edit Akun — <span class="cmd">/edit</span></div>
+      <div class="info-card">
+        <p>Gunakan <span class="cmd">/edit</span> untuk mengubah data akun game yang sudah terdaftar.</p>
+        <p>Bot menampilkan daftar akunmu → pilih akun yang ingin diedit → form terbuka dengan data lama sudah terisi → ubah field yang diperlukan → submit.</p>
+      </div>
+
+      <div class="step-list">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Jalankan <span class="cmd">/edit</span></div>
+            <div class="step-body">Jika kamu punya lebih dari 1 akun, bot tampilkan dropdown untuk memilih akun mana yang ingin diedit.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Ubah data di form</div>
+            <div class="step-body">Form muncul dengan data lama sudah terisi. Ubah field yang perlu diubah: Nickname, Guild, atau Server.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Submit</div>
+            <div class="step-body">
+              Jika server menggunakan mode manual → akun kembali ke status <strong>pending</strong>, menunggu re-approval admin.<br>
+              Jika mode auto → langsung approved dengan data baru.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unregister -->
+    <div class="subsection">
+      <div class="subsection-title">Unregister — <span class="cmd">/unregister</span></div>
+      <div class="info-card">
+        <p>Gunakan <span class="cmd">/unregister</span> untuk menghapus akun game dari database server.</p>
+      </div>
+
+      <div class="step-list">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Jalankan <span class="cmd">/unregister</span></div>
+            <div class="step-body">
+              Punya 1 akun → bot minta konfirmasi langsung.<br>
+              Punya &gt; 1 akun → bot tampilkan dropdown, pilih akun mana yang ingin dihapus.
+            </div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Konfirmasi</div>
+            <div class="step-body">Akun dihapus dari database. Role guild yang di-assign akan dicabut jika tidak ada akun approved lain dari guild yang sama.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-yellow">
+        <span class="callout-icon">⚠️</span>
+        Setelah unregister, kamu perlu register ulang jika ingin terdaftar kembali.
+        Daftar guild di <span class="cmd">#guild-list</span> akan ter-update otomatis.
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 5 — Guild List
+  ════════════════════════════════════════════ -->
+  <section id="guild-list">
+    <div class="section-title">🏰 Guild List</div>
+    <div class="section-desc">Cara membaca daftar guild di channel <span class="cmd">#guild-list</span>.</div>
+    <hr class="section-divider">
+
+    <!-- Info -->
+    <div class="subsection">
+      <div class="info-card">
+        <div class="info-card-title">📋 Tentang Guild List</div>
+        <p>Channel <span class="cmd">#guild-list</span> menampilkan semua guild aktif beserta member yang terdaftar.
+        Daftar ini <strong style="color:#f2f3f5">ter-update otomatis</strong> setiap kali ada member yang bergabung atau keluar dari guild.</p>
+        <p>Jika server memiliki banyak guild (lebih dari 8), daftar ditampilkan dalam beberapa pesan berurutan di channel yang sama.</p>
+      </div>
+    </div>
+
+    <!-- Format explanation -->
+    <div class="subsection">
+      <div class="subsection-title">Format Tampilan</div>
+      <div class="guild-embed">
+        <div class="embed-title">✦ Daftar Guild — Celestial Server</div>
+
+        <div class="guild-field">
+          <div class="guild-field-name">🏰 amateurs (3 member)</div>
+          <div class="guild-field-header">Casual · Lv.20 · Guild untuk pemula</div>
+          <div class="guild-members">
+            Ruiza <span style="color:#7289da">@Dantalian</span> Asia
+            <span class="guild-sep"> · </span>
+            Player2 <span style="color:#7289da">@Piaro</span> Asia
+            <span class="guild-sep"> · </span>
+            Player3 <span style="color:#7289da">@X</span> Global
+          </div>
+        </div>
+
+        <div class="guild-field">
+          <div class="guild-field-name">🏰 virtue (2 member)</div>
+          <div class="guild-field-header">Kompetitif · Lv.45</div>
+          <div class="guild-members">
+            Plattt <span style="color:#7289da">@Dantalian</span> Asia
+            <span class="guild-sep"> · </span>
+            Player4 <span style="color:#7289da">@Y</span> Korea
+          </div>
+        </div>
+
+        <div class="guild-field">
+          <div class="guild-field-name">👤 Tanpa Guild</div>
+          <div class="guild-members">
+            FreeAgent <span style="color:#7289da">@Z</span> Global
+            <span class="guild-sep"> · </span>
+            Wanderer <span style="color:#7289da">@W</span> Asia
+          </div>
+        </div>
+
+        <div class="embed-footer">Total member terdaftar: 7</div>
+      </div>
+
+      <!-- Legend -->
+      <div class="info-card">
+        <div class="info-card-title">📌 Keterangan</div>
+        <p><strong style="color:#f2f3f5">Nama Guild (N member)</strong> — jumlah member yang approved di guild ini</p>
+        <p><em style="color:#949ba4">Tipe · Level · Keterangan</em> — info guild yang diset admin (mungkin tidak ada)</p>
+        <p><strong style="color:#f2f3f5">Nickname</strong> <span style="color:#7289da">@DiscordUser</span> Server — satu entry per member, dipisah tanda <span class="cmd">·</span></p>
+        <p><strong style="color:#f2f3f5">👤 Tanpa Guild</strong> — member yang approved tapi belum/tidak bergabung guild manapun</p>
+      </div>
+    </div>
+
+    <div class="callout callout-blue">
+      <span class="callout-icon">💡</span>
+      Nama yang tampil di guild list adalah <strong>nickname in-game</strong>, bukan username Discord.
+      Klik mention <span style="color:#7289da">@DiscordUser</span> untuk melihat profil Discord mereka.
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+  // ── Sticky nav active highlight on scroll ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.flow-nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // ── Smooth scroll ──
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

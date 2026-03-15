@@ -7,8 +7,9 @@ from bot.utils.database import (
     get_all_guild_roles, set_setting, get_setting,
     get_accounts_by_discord_id, get_account, delete_account,
     get_account_stats, get_guild_count,
+    update_account_fields, check_nickname_exists,
 )
-from bot.utils.roles import update_guild_list, update_member_list
+from bot.utils.roles import update_guild_list, update_member_list, assign_role
 from bot.cogs.register import RegisterButton
 from config import (
     REGISTER_CHANNEL_ID, OTHER_GAMES_CHANNEL_ID, WELCOME_CHANNEL_ID,
@@ -147,6 +148,90 @@ class GuildDeleteView(discord.ui.View):
     def __init__(self, guild_roles):
         super().__init__(timeout=60)
         self.add_item(GuildDeleteSelect(guild_roles))
+
+
+class AdminEditModal(discord.ui.Modal, title="✦ Admin Edit Akun"):
+    def __init__(self, account, target_member: discord.Member):
+        super().__init__()
+        self.account_id = account["id"]
+        self.target_member = target_member
+        self.server_input = discord.ui.TextInput(
+            label="Server *",
+            default=account["server"],
+            required=True,
+            max_length=50,
+        )
+        self.guild_input = discord.ui.TextInput(
+            label="Guild (opsional)",
+            default=account["guild"] or "",
+            required=False,
+            max_length=100,
+        )
+        self.nickname_input = discord.ui.TextInput(
+            label="Nickname In-game *",
+            default=account["nickname"],
+            required=True,
+            max_length=100,
+        )
+        self.add_item(self.server_input)
+        self.add_item(self.guild_input)
+        self.add_item(self.nickname_input)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
+        server_val = self.server_input.value.strip()
+        guild_val = self.guild_input.value.strip()
+        nickname_val = self.nickname_input.value.strip()
+
+        if await check_nickname_exists(nickname_val, server_val, exclude_account_id=self.account_id):
+            await interaction.followup.send(
+                f"❌ Nickname **{nickname_val}** sudah dipakai di server **{server_val}**.",
+                ephemeral=True,
+            )
+            return
+
+        await update_account_fields(self.account_id, nickname_val, guild_val, server_val)
+        account = await get_account(self.account_id)
+
+        if account and account["status"] == "approved":
+            await assign_role(interaction.client, account["discord_id"], account)
+            await update_guild_list(interaction.client)
+            await update_member_list(interaction.client)
+
+        await interaction.followup.send(
+            f"✅ Akun **{nickname_val}** [{server_val}] milik {self.target_member.mention} berhasil diperbarui.",
+            ephemeral=True,
+        )
+
+
+class AdminEditSelect(discord.ui.Select):
+    def __init__(self, accounts, target_member: discord.Member):
+        self.target_member = target_member
+        options = [
+            discord.SelectOption(
+                label=f"{acc['nickname']} [{acc['server']}]",
+                description=f"Guild: {acc['guild'] or '—'} · Status: {acc['status']}",
+                value=str(acc["id"]),
+            )
+            for acc in accounts
+        ]
+        super().__init__(placeholder="Pilih akun yang ingin diedit...", options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        account_id = int(self.values[0])
+        account = await get_account(account_id)
+        if not account:
+            await interaction.response.send_message("❌ Akun tidak ditemukan.", ephemeral=True)
+            return
+        await interaction.response.send_modal(AdminEditModal(account, self.target_member))
+        self.view.stop()
+
+
+class AdminEditView(discord.ui.View):
+    def __init__(self, accounts, target_member: discord.Member):
+        super().__init__(timeout=60)
+        self.add_item(AdminEditSelect(accounts, target_member))
 
 
 class AdminUnregisterSelect(discord.ui.Select):
@@ -425,6 +510,36 @@ class AdminCog(commands.Cog):
         await update_member_list(interaction.client)
         await interaction.followup.send("✅ Daftar member berhasil diperbarui.", ephemeral=True)
 
+    @app_commands.command(name="admin-edit", description="[Admin] Edit akun game milik user tertentu")
+    @app_commands.default_permissions(manage_roles=True)
+    async def admin_edit(self, interaction: discord.Interaction, member: discord.Member):
+        await interaction.response.defer(ephemeral=True)
+
+        accounts = await get_accounts_by_discord_id(str(member.id))
+        if not accounts:
+            await interaction.followup.send(
+                f"❌ {member.mention} tidak memiliki akun terdaftar.", ephemeral=True
+            )
+            return
+
+        if len(accounts) == 1:
+            account = await get_account(accounts[0]["id"])
+            modal = AdminEditModal(account, member)
+            # followup tidak bisa send_modal, jadi kirim view dulu
+            view = AdminEditView(accounts, member)
+            await interaction.followup.send(
+                f"Pilih akun milik {member.mention} yang ingin diedit:",
+                view=view,
+                ephemeral=True,
+            )
+        else:
+            view = AdminEditView(accounts, member)
+            await interaction.followup.send(
+                f"Pilih akun milik {member.mention} yang ingin diedit:",
+                view=view,
+                ephemeral=True,
+            )
+
     @app_commands.command(name="admin-unregister", description="[Admin] Hapus akun game milik user tertentu")
     @app_commands.default_permissions(manage_roles=True)
     async def admin_unregister(self, interaction: discord.Interaction, member: discord.Member):
@@ -497,6 +612,7 @@ class AdminCog(commands.Cog):
             value=(
                 "`/help` — Lihat daftar command ini\n"
                 "`/profile-list` — Force refresh daftar member\n"
+                "`/admin-edit <member>` — Edit akun user\n"
                 "`/admin-unregister <member>` — Hapus akun user\n"
                 "`/bot-status` — Status bot & statistik"
             ),

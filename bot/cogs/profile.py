@@ -8,7 +8,11 @@ from bot.utils.database import (
 )
 
 
-STATUS_MAP = {"approved": "Approved", "pending": "Pending", "rejected": "Rejected"}
+STATUS_MAP = {
+    "approved": "✅ Approved",
+    "pending": "⏳ Pending",
+    "rejected": "❌ Rejected",
+}
 
 
 def format_date(raw):
@@ -32,30 +36,26 @@ def build_profile_embed(user: discord.User | discord.Member, accounts: list) -> 
         embed.description = "*Tidak ada akun terdaftar.*"
         return embed
 
-    desc = ""
     if isinstance(user, discord.Member) and user.joined_at:
-        desc = f"Member since {user.joined_at.strftime('%d %b %Y')}\n"
+        embed.description = f"Member since {user.joined_at.strftime('%d %b %Y')}"
 
-    lines = []
     for i, acc in enumerate(accounts, start=1):
         status = STATUS_MAP.get(acc["status"], "Unknown")
         guild_val = acc["guild"] if acc["guild"] else "—"
         created = format_date(acc["created_at"])
 
-        if i > 1:
-            lines.append("")
-        lines.append(f"Akun #{i} ({status})")
-        lines.append(f"  Nickname  : {acc['nickname']}")
-        lines.append(f"  Guild     : {guild_val}")
-        lines.append(f"  Server    : {acc['server']}")
-        lines.append(f"  Terdaftar : {created}")
+        embed.add_field(
+            name=f"⚔️ Akun #{i} · {status}",
+            value=(
+                f"Nickname : `{acc['nickname']}`\n"
+                f"Guild    : `{guild_val}`\n"
+                f"Server   : `{acc['server']}`\n"
+                f"Terdaftar: `{created}`"
+            ),
+            inline=False,
+        )
 
-    lines.append("")
-    lines.append(f"Total: {len(accounts)} akun terdaftar")
-
-    desc += "```\n" + "\n".join(lines) + "\n```"
-    embed.description = desc
-
+    embed.set_footer(text=f"Total: {len(accounts)} akun terdaftar")
     return embed
 
 

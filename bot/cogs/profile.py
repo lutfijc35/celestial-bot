@@ -47,10 +47,10 @@ def build_profile_embed(user: discord.User | discord.Member, accounts: list) -> 
         embed.add_field(
             name=f"⚔️ Akun #{i} · {status}",
             value=(
-                f"Nickname : `{acc['nickname']}`\n"
-                f"Guild    : `{guild_val}`\n"
-                f"Server   : `{acc['server']}`\n"
-                f"Terdaftar: `{created}`"
+                f"`Nickname ` : {acc['nickname']}\n"
+                f"`Guild    ` : {guild_val}\n"
+                f"`Server   ` : {acc['server']}\n"
+                f"`Terdaftar` : {created}"
             ),
             inline=False,
         )

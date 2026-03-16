@@ -1,3 +1,5 @@
+import subprocess
+
 import discord
 from datetime import datetime, timezone
 from discord import app_commands
@@ -503,6 +505,65 @@ class AdminCog(commands.Cog):
             ephemeral=True,
         )
 
+    @app_commands.command(name="setup-changelog", description="[Admin] Set channel ini sebagai changelog channel")
+    @app_commands.default_permissions(manage_channels=True)
+    async def setup_changelog(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        await set_setting("changelog_channel_id", str(interaction.channel.id))
+        await interaction.followup.send(
+            f"✅ Changelog channel diset ke <#{interaction.channel.id}>.",
+            ephemeral=True,
+        )
+
+    @app_commands.command(name="changelog", description="[Admin] Post changelog dari git commits terbaru")
+    @app_commands.default_permissions(manage_guild=True)
+    async def changelog(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
+        ch_id = await get_setting("changelog_channel_id")
+        if not ch_id:
+            await interaction.followup.send(
+                "❌ Channel changelog belum diset. Gunakan `/setup-changelog`.", ephemeral=True
+            )
+            return
+
+        channel = interaction.client.get_channel(int(ch_id))
+        if not channel:
+            await interaction.followup.send("❌ Channel changelog tidak ditemukan.", ephemeral=True)
+            return
+
+        last_hash = await get_setting("changelog_last_hash")
+
+        if last_hash:
+            result = subprocess.run(
+                ["git", "log", f"{last_hash}..HEAD", "--oneline", "--no-decorate"],
+                capture_output=True, text=True,
+            )
+        else:
+            result = subprocess.run(
+                ["git", "log", "--oneline", "--no-decorate"],
+                capture_output=True, text=True,
+            )
+
+        commits = result.stdout.strip()
+        if not commits:
+            await interaction.followup.send("✅ Tidak ada perubahan baru.", ephemeral=True)
+            return
+
+        new_hash = commits.split("\n")[0].split(" ")[0]
+        await set_setting("changelog_last_hash", new_hash)
+
+        now = datetime.now(timezone.utc)
+        embed = discord.Embed(
+            title="📋 Changelog — Celestial Bot",
+            description=f"```\n{commits}\n```",
+            color=0x5865f2,
+        )
+        embed.set_footer(text=now.strftime("%Y-%m-%d %H:%M UTC"))
+
+        await channel.send(embed=embed)
+        await interaction.followup.send("✅ Changelog berhasil di-post.", ephemeral=True)
+
     @app_commands.command(name="profile-list", description="[Admin] Force refresh daftar member")
     @app_commands.default_permissions(manage_roles=True)
     async def profile_list(self, interaction: discord.Interaction):
@@ -603,7 +664,8 @@ class AdminCog(commands.Cog):
                 "`/setup-welcome` — Set welcome channel\n"
                 "`/setup-register-here` — Set register channel\n"
                 "`/setup-other-games` — Set other-games channel\n"
-                "`/setup-approval-ping <role>` — Toggle approval ping role"
+                "`/setup-approval-ping <role>` — Toggle approval ping role\n"
+                "`/setup-changelog` — Set changelog channel"
             ),
             inline=False,
         )
@@ -614,6 +676,7 @@ class AdminCog(commands.Cog):
                 "`/profile-list` — Force refresh daftar member\n"
                 "`/admin-edit <member>` — Edit akun user\n"
                 "`/admin-unregister <member>` — Hapus akun user\n"
+                "`/changelog` — Post changelog ke channel\n"
                 "`/bot-status` — Status bot & statistik"
             ),
             inline=False,
@@ -673,6 +736,8 @@ class AdminCog(commands.Cog):
         embed.add_field(name="\u200b", value="\u200b", inline=True)
 
         profile_id = int(profile_id_str) if profile_id_str else None
+        changelog_id_str = await get_setting("changelog_channel_id")
+        changelog_id = int(changelog_id_str) if changelog_id_str else None
         rules_val = f"`{rules_msg_id}` ✅" if rules_msg_id else "— belum diset ❌"
         embed.add_field(
             name="📢 Channels",
@@ -684,6 +749,7 @@ class AdminCog(commands.Cog):
                 f"Register    │ {fmt_channel(register_id)}\n"
                 f"Other Games │ {fmt_channel(other_id)}\n"
                 f"Profile     │ {fmt_channel(profile_id)}\n"
+                f"Changelog   │ {fmt_channel(changelog_id)}\n"
                 f"Rules Msg   │ {rules_val}"
             ),
             inline=False,

@@ -1,10 +1,24 @@
 import discord
+from datetime import datetime
 from discord import app_commands
 from discord.ext import commands
 from bot.utils.database import (
     get_accounts_by_discord_id,
     get_approved_accounts_by_discord_id,
 )
+
+
+STATUS_MAP = {"approved": "Approved", "pending": "Pending", "rejected": "Rejected"}
+
+
+def format_date(raw):
+    if not raw:
+        return "—"
+    try:
+        dt = datetime.strptime(raw[:10], "%Y-%m-%d")
+        return dt.strftime("%d %b %Y")
+    except Exception:
+        return raw[:10]
 
 
 def build_profile_embed(user: discord.User | discord.Member, accounts: list) -> discord.Embed:
@@ -18,19 +32,29 @@ def build_profile_embed(user: discord.User | discord.Member, accounts: list) -> 
         embed.description = "*Tidak ada akun terdaftar.*"
         return embed
 
+    desc = ""
+    if isinstance(user, discord.Member) and user.joined_at:
+        desc = f"Member since {user.joined_at.strftime('%d %b %Y')}\n"
+
+    lines = []
     for i, acc in enumerate(accounts, start=1):
-        status_emoji = {"approved": "✅", "pending": "⏳", "rejected": "❌"}.get(acc["status"], "❓")
+        status = STATUS_MAP.get(acc["status"], "Unknown")
         guild_val = acc["guild"] if acc["guild"] else "—"
-        embed.add_field(
-            name=f"⚔️ Akun #{i}  {status_emoji}",
-            value=(
-                f"Nickname `{acc['nickname']}`\n"
-                f"Guild `{guild_val}`\n"
-                f"Server `{acc['server']}`\n"
-                f"Game `{acc['game']}`"
-            ),
-            inline=True,
-        )
+        created = format_date(acc["created_at"])
+
+        if i > 1:
+            lines.append("")
+        lines.append(f"Akun #{i} ({status})")
+        lines.append(f"  Nickname  : {acc['nickname']}")
+        lines.append(f"  Guild     : {guild_val}")
+        lines.append(f"  Server    : {acc['server']}")
+        lines.append(f"  Terdaftar : {created}")
+
+    lines.append("")
+    lines.append(f"Total: {len(accounts)} akun terdaftar")
+
+    desc += "```\n" + "\n".join(lines) + "\n```"
+    embed.description = desc
 
     return embed
 
@@ -47,11 +71,9 @@ class ProfileCog(commands.Cog):
         user: discord.Member = None,
     ):
         if user is None:
-            # Lihat profil sendiri — tampilkan semua akun
             accounts = await get_accounts_by_discord_id(str(interaction.user.id))
             target = interaction.user
         else:
-            # Lihat profil orang lain — hanya akun approved
             accounts = await get_approved_accounts_by_discord_id(str(user.id))
             target = user
 

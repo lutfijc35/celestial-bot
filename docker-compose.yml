@@ -5,3 +5,4 @@ services:
     env_file: .env
     volumes:
       - ./data:/app/data   # SQLite db persist
+      - ./.git:/app/.git:ro  # Git history for /changelog

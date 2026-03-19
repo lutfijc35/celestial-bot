@@ -15,6 +15,7 @@ from bot.utils.database import init_db, get_setting
 from bot.cogs.register import RegisterCog, ApprovalView, RegisterButton
 from bot.cogs.admin import AdminCog
 from bot.cogs.profile import ProfileCog
+from bot.cogs.starboard import StarboardCog
 
 logging.basicConfig(
     level=logging.INFO,
@@ -74,6 +75,7 @@ async def on_ready():
     await bot.add_cog(RegisterCog(bot))
     await bot.add_cog(AdminCog(bot))
     await bot.add_cog(ProfileCog(bot))
+    await bot.add_cog(StarboardCog(bot))
 
     # Re-register persistent views (agar button tetap berfungsi setelah restart)
     bot.add_view(ApprovalView())

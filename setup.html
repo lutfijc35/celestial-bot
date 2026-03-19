@@ -1527,6 +1527,31 @@ docker-compose down</div>
         <span>Post changelog dari git commits terbaru ke channel changelog. Otomatis track commits baru saja</span>
       </div>
       <div class="extras-item">
+        <span class="cmd">/setup-starboard</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set channel ini sebagai starboard target (tempat repost pesan bintang)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/setup-starboard-source</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set channel ini sebagai sumber starboard (pesan yang dimonitor untuk react ⭐)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/setup-starboard-role @role</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set role sementara yang diberikan saat pesan masuk starboard (otomatis dicabut setelah 30 hari)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/setup-starboard-threshold &lt;count&gt;</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set minimum bintang untuk masuk starboard (default: 5)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/leaderboard</span>
+        <span style="color:#949ba4">—</span>
+        <span>Top 10 user dengan pesan paling banyak di starboard (bisa dijalankan semua user)</span>
+      </div>
+      <div class="extras-item">
         <span class="cmd">/help</span>
         <span style="color:#949ba4">—</span>
         <span>Lihat daftar semua command bot beserta syntax (bisa dijalankan semua user)</span>
@@ -1612,6 +1637,21 @@ docker-compose down</div>
           <strong style="color:#f2f3f5">Remove guild</strong> —
           Jalankan <span class="cmd">/remove-guild</span> → pilih guild → guild terhapus dari database,
           <span class="cmd">#guild-list</span> ter-update otomatis
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Starboard</strong> —
+          Setup 4 command starboard → kirim pesan di source channel → react ⭐ x5 →
+          embed muncul di target channel + role sementara di-assign ke author
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Leaderboard</strong> —
+          Jalankan <span class="cmd">/leaderboard</span> → embed ranking top 10 user starboard tampil
         </span>
       </div>
     </div>

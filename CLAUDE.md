@@ -63,7 +63,27 @@ celestial/
 | `/setup-welcome` | Set channel ini sebagai welcome channel (on_member_join) |
 | `/bot-status` | Lihat status bot: uptime, latency, statistik akun, konfigurasi channel |
 | `/profile-list` | Force refresh daftar member |
+| `/admin-edit @user` | Edit akun game milik user tertentu |
 | `/admin-unregister @user` | Hapus akun game milik user tertentu (tanpa perlu minta user unregister) |
+| `/guild-list` | Lihat semua guild yang sudah di-mapping |
+| `/remove-guild` | Hapus mapping guild dari database |
+| `/setup-register` | Post embed registrasi ke channel ini |
+| `/setup-register-here` | Set channel ini sebagai register channel (dibuka setelah react rules) |
+| `/setup-other-games` | Set channel ini sebagai other-games channel (dibuka setelah react rules) |
+| `/setup-approval-ping <@role>` | Toggle role yang di-ping saat ada approval request |
+| `/setup-changelog` | Set channel ini sebagai changelog channel |
+| `/changelog` | Post changelog dari git commits terbaru |
+| `/help` | Lihat daftar semua command bot |
+
+### Starboard Commands
+
+| Command | Deskripsi |
+|---|---|
+| `/setup-starboard` | Set channel ini sebagai starboard target (tempat repost) |
+| `/setup-starboard-source` | Set channel ini sebagai sumber starboard (pesan yang dimonitor) |
+| `/setup-starboard-role <@role>` | Set role sementara yang diberikan (30 hari) |
+| `/setup-starboard-threshold <count>` | Set minimum bintang untuk masuk starboard (default: 5) |
+| `/leaderboard` | Top 10 user dengan pesan paling banyak di starboard |
 
 ## Events (Bot Listeners)
 
@@ -71,6 +91,7 @@ celestial/
 |---|---|
 | `on_member_join` | Bot kirim embed welcome ke `#welcome` channel secara otomatis |
 | `on_raw_reaction_add` | Deteksi react ✅ di pesan rules → assign role `Member` → unlock #register-here & #other-games |
+| `on_raw_reaction_add` | Deteksi react ⭐ di channel starboard source → jika threshold tercapai, repost ke starboard + assign temp role |
 
 ## Role Assignment Logic
 

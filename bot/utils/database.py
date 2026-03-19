@@ -59,6 +59,18 @@ async def init_db():
                 updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (channel_id, page_index)
             );
+
+            CREATE TABLE IF NOT EXISTS starboard_entries (
+                id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_message_id    TEXT NOT NULL UNIQUE,
+                starboard_message_id TEXT NOT NULL,
+                author_discord_id    TEXT NOT NULL,
+                star_count           INTEGER NOT NULL DEFAULT 0,
+                role_assigned_at     DATETIME,
+                role_expires_at      DATETIME,
+                role_removed         INTEGER NOT NULL DEFAULT 0,
+                created_at           DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
         """)
         await db.commit()
 
@@ -353,3 +365,80 @@ async def get_guild_count() -> int:
         cursor = await db.execute("SELECT COUNT(*) FROM guild_roles")
         row = await cursor.fetchone()
     return row[0] if row else 0
+
+
+# ── Starboard ─────────────────────────────────────────────────────
+
+async def get_starboard_entry(source_message_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM starboard_entries WHERE source_message_id = ?",
+            (source_message_id,)
+        ) as cur:
+            return await cur.fetchone()
+
+
+async def create_starboard_entry(
+    source_message_id: str,
+    starboard_message_id: str,
+    author_discord_id: str,
+    star_count: int,
+    role_assigned_at: str | None,
+    role_expires_at: str | None,
+) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """INSERT INTO starboard_entries
+               (source_message_id, starboard_message_id, author_discord_id,
+                star_count, role_assigned_at, role_expires_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (source_message_id, starboard_message_id, author_discord_id,
+             star_count, role_assigned_at, role_expires_at)
+        ) as cur:
+            entry_id = cur.lastrowid
+        await db.commit()
+        return entry_id
+
+
+async def update_starboard_star_count(source_message_id: str, star_count: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE starboard_entries SET star_count = ? WHERE source_message_id = ?",
+            (star_count, source_message_id)
+        )
+        await db.commit()
+
+
+async def get_expired_starboard_roles():
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT * FROM starboard_entries
+               WHERE role_expires_at <= datetime('now')
+               AND role_removed = 0
+               AND role_assigned_at IS NOT NULL"""
+        ) as cur:
+            return await cur.fetchall()
+
+
+async def mark_starboard_role_removed(source_message_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE starboard_entries SET role_removed = 1 WHERE source_message_id = ?",
+            (source_message_id,)
+        )
+        await db.commit()
+
+
+async def get_starboard_leaderboard(limit: int = 10):
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT author_discord_id, COUNT(*) as count
+               FROM starboard_entries
+               GROUP BY author_discord_id
+               ORDER BY count DESC
+               LIMIT ?""",
+            (limit,)
+        ) as cur:
+            return await cur.fetchall()

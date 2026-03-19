@@ -681,6 +681,17 @@ class AdminCog(commands.Cog):
             ),
             inline=False,
         )
+        embed.add_field(
+            name="⭐ Starboard",
+            value=(
+                "`/setup-starboard` — Set starboard target channel\n"
+                "`/setup-starboard-source` — Set source channel\n"
+                "`/setup-starboard-role <role>` — Set temp role (30 hari)\n"
+                "`/setup-starboard-threshold <count>` — Set min stars\n"
+                "`/leaderboard` — Top 10 starboard ranking"
+            ),
+            inline=False,
+        )
         embed.set_footer(text="<wajib> · [opsional] · Admin commands perlu permission khusus")
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -772,6 +783,20 @@ class AdminCog(commands.Cog):
                 f"Approval Ping │ {ping_val}"
             ),
             inline=True,
+        )
+        sb_ch_str = await get_setting("starboard_channel_id")
+        sb_src_str = await get_setting("starboard_source_channel_id")
+        sb_role_str = await get_setting("starboard_role_id")
+        sb_threshold = await get_setting("starboard_threshold") or "5"
+        embed.add_field(
+            name="⭐ Starboard",
+            value=(
+                f"Target    │ {fmt_channel(int(sb_ch_str) if sb_ch_str else None)}\n"
+                f"Source    │ {fmt_channel(int(sb_src_str) if sb_src_str else None)}\n"
+                f"Role      │ {fmt_role(int(sb_role_str) if sb_role_str else None)}\n"
+                f"Threshold │ `{sb_threshold}` stars"
+            ),
+            inline=False,
         )
         embed.set_footer(text=f"Celestial · {now.strftime('%Y-%m-%d %H:%M:%S')} UTC")
         await interaction.followup.send(embed=embed, ephemeral=True)

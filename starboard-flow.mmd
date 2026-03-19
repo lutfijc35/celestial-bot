@@ -1,0 +1,22 @@
+flowchart TD
+    A["👤 User kirim pesan\ndi #tambak-garam"] --> B["⭐ User lain react\nbintang pada pesan"]
+    B --> C{"Jumlah ⭐ >= 5?"}
+
+    C -- Tidak --> D["⏳ Tunggu react lagi\nBot pantau terus"]
+    D --> B
+
+    C -- Ya --> E["⭐ Threshold tercapai!"]
+    E --> F["📋 Bot repost embed\nke #orang-hitam\n(embed gold + jump link)"]
+    F --> G["✅ Bot assign role\nsementara ke author"]
+    G --> H["⏰ Tunggu 30 hari\n(background task cek tiap jam)"]
+    H --> I["🔄 Bot otomatis\ncabut role"]
+
+    style A fill:#3c4270,stroke:#5865f2,color:#c9cdf7
+    style B fill:#3c4270,stroke:#5865f2,color:#c9cdf7
+    style C fill:#3d3117,stroke:#faa61a,color:#f9d77a
+    style D fill:#2b2d31,stroke:#4e5058,color:#b5bac1
+    style E fill:#3d3117,stroke:#ffd700,color:#ffe066
+    style F fill:#3d3117,stroke:#ffd700,color:#ffe066
+    style G fill:#1a3d2b,stroke:#3ba55c,color:#79cf8e
+    style H fill:#2e2036,stroke:#9b59b6,color:#c9a0dc
+    style I fill:#3d1a1a,stroke:#ed4245,color:#f38183

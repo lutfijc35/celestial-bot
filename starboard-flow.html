@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celestial Bot — Starboard Flow</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'gg sans', 'Noto Sans', Whitney, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #1e1f22;
+      color: #dcddde;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 32px 60px;
+    }
+
+    /* ── Title ── */
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: #949ba4;
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2b2d31;
+      margin: 40px 0;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 32px;
+      padding: 12px 16px;
+      background: #2b2d31;
+      border-radius: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: #b5bac1;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── Flow ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* ── Nodes ── */
+    .node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 280px;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .node-sub {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      margin-top: 3px;
+      opacity: 0.75;
+    }
+
+    .node-process {
+      background: #3c4270;
+      border: 1px solid #5865f2;
+      color: #c9cdf7;
+    }
+
+    .node-decision {
+      background: #3d3117;
+      border: 1px solid #faa61a;
+      color: #f9d77a;
+      clip-path: polygon(16px 0%, calc(100% - 16px) 0%, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0% 50%);
+      padding: 12px 36px;
+      min-width: 300px;
+    }
+
+    .node-success {
+      background: #1a3d2b;
+      border: 1px solid #3ba55c;
+      color: #79cf8e;
+    }
+
+    .node-gold {
+      background: #3d3117;
+      border: 1px solid #ffd700;
+      color: #ffe066;
+    }
+
+    .node-info {
+      background: #2b2d31;
+      border: 1px solid #4e5058;
+      color: #b5bac1;
+    }
+
+    .node-reject {
+      background: #3d1a1a;
+      border: 1px solid #ed4245;
+      color: #f38183;
+    }
+
+    /* ── Arrows ── */
+    .arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 0;
+      color: #4e5058;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .arrow-label {
+      font-size: 11px;
+      color: #949ba4;
+      margin-bottom: 2px;
+    }
+
+    /* ── Branch (decision split) ── */
+    .branch {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .branch-path {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      gap: 0;
+    }
+
+    .branch-label {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+
+    .branch-yes {
+      background: #1a3d2b;
+      color: #3ba55c;
+    }
+
+    .branch-no {
+      background: #3d1a1a;
+      color: #ed4245;
+    }
+
+    /* ── Embed mockup ── */
+    .embed-mockup {
+      background: #2b2d31;
+      border-left: 4px solid #ffd700;
+      border-radius: 0 4px 4px 0;
+      padding: 16px 18px;
+      max-width: 440px;
+      margin: 0 auto 20px;
+    }
+
+    .embed-author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .embed-avatar {
+      width: 28px;
+      height: 28px;
+      background: #5865f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .embed-author-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f2f3f5;
+    }
+
+    .embed-body {
+      font-size: 13px;
+      color: #dcddde;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .embed-link {
+      font-size: 12px;
+      color: #5865f2;
+      text-decoration: none;
+    }
+
+    .embed-footer {
+      font-size: 11px;
+      color: #949ba4;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #3f4147;
+    }
+
+    .embed-image {
+      width: 100%;
+      height: 120px;
+      background: #1e1f22;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4e5058;
+      font-size: 12px;
+    }
+
+    /* ── Setup table ── */
+    .setup-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .setup-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #2b2d31;
+      border-bottom: 1px solid #1e1f22;
+      font-size: 13px;
+    }
+
+    .setup-item:last-child { border-bottom: none; }
+
+    .setup-cmd {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      background: #111214;
+      border: 1px solid #3f4147;
+      border-radius: 3px;
+      padding: 2px 8px;
+      color: #b9bbbe;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .setup-desc {
+      color: #b5bac1;
+      line-height: 1.5;
+    }
+
+    /* ── Timer visual ── */
+    .timer-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #2e2036;
+      border: 1px solid #9b59b6;
+      border-radius: 6px;
+      color: #c9a0dc;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 280px;
+      max-width: 400px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── Title ── -->
+  <div class="page-title">⭐ Starboard Flow — Celestial Bot</div>
+  <div class="page-subtitle">Alur fitur starboard: pesan populer di-repost + role sementara 30 hari</div>
+
+  <!-- ── Legend ── -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#5865f2"></div>
+      Proses
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#faa61a"></div>
+      Keputusan
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#ffd700"></div>
+      Starboard
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#3ba55c"></div>
+      Sukses
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#9b59b6"></div>
+      Timer
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#ed4245"></div>
+      Stop
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       FLOW DIAGRAM
+  ════════════════════════════════════════ -->
+  <div class="section-title">📋 Alur Utama</div>
+
+  <div class="flow">
+
+    <!-- Step 1 -->
+    <div class="node node-process">
+      👤 User kirim pesan di <strong>#tambak-garam</strong>
+      <span class="node-sub">Pesan text, gambar, atau keduanya</span>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- Step 2 -->
+    <div class="node node-process">
+      ⭐ User lain react bintang pada pesan
+      <span class="node-sub">Bot mendeteksi setiap react ⭐ baru</span>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- Decision -->
+    <div class="node node-decision">
+      Jumlah ⭐ &gt;= threshold?
+      <span class="node-sub">Default: 5 bintang</span>
+    </div>
+
+    <div class="arrow" style="padding:8px 0">
+      <div style="display:flex;gap:120px">
+        <span class="branch-label branch-no">Tidak</span>
+        <span class="branch-label branch-yes">Ya</span>
+      </div>
+    </div>
+
+    <!-- Branch -->
+    <div class="branch">
+      <div class="branch-path">
+        <div class="node node-info" style="min-width:unset;font-size:12px;padding:8px 16px">
+          Tunggu react lagi
+          <span class="node-sub">Bot pantau terus</span>
+        </div>
+      </div>
+
+      <div class="branch-path">
+        <div class="node node-gold" style="min-width:unset">
+          ⭐ Threshold tercapai!
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node node-gold">
+          Bot repost embed ke <strong>#orang-hitam</strong>
+          <span class="node-sub">Embed gold: isi pesan + gambar + jump link</span>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node node-success">
+          ✅ Bot assign role sementara ke author
+          <span class="node-sub">Role yang diset admin via /setup-starboard-role</span>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="timer-node">
+          ⏰ Tunggu 30 hari
+          <span class="node-sub">Background task cek setiap jam</span>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node node-reject">
+          🔄 Bot otomatis cabut role
+          <span class="node-sub">Role dihapus dari member, entry ditandai selesai</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════════════
+       EMBED MOCKUP
+  ════════════════════════════════════════ -->
+  <div class="section-title">🖼️ Tampilan Embed di #orang-hitam</div>
+
+  <div class="embed-mockup">
+    <div class="embed-author">
+      <div class="embed-avatar">P</div>
+      <div class="embed-author-name">Piaro</div>
+    </div>
+    <div class="embed-body">
+      ini pesan asli yang dikirim di #tambak-garam, bisa berisi text atau gambar
+    </div>
+    <div class="embed-image">[ image attachment ]</div>
+    <div>
+      <span style="font-size:12px;font-weight:700;color:#f2f3f5">Source</span><br>
+      <span class="embed-link">Jump to message →</span>
+    </div>
+    <div class="embed-footer">⭐ 5 | #tambak-garam</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════════════
+       SETUP COMMANDS
+  ════════════════════════════════════════ -->
+  <div class="section-title">⚙️ Setup Commands</div>
+
+  <div class="setup-list">
+    <div class="setup-item">
+      <span class="setup-cmd">/setup-starboard</span>
+      <span class="setup-desc">Jalankan di <strong>#orang-hitam</strong> — set channel target tempat embed starboard di-post</span>
+    </div>
+    <div class="setup-item">
+      <span class="setup-cmd">/setup-starboard-source</span>
+      <span class="setup-desc">Jalankan di <strong>#tambak-garam</strong> — set channel yang dimonitor untuk react ⭐</span>
+    </div>
+    <div class="setup-item">
+      <span class="setup-cmd">/setup-starboard-role @role</span>
+      <span class="setup-desc">Pilih role yang diberikan sementara ke author — otomatis dicabut setelah 30 hari</span>
+    </div>
+    <div class="setup-item">
+      <span class="setup-cmd">/setup-starboard-threshold 5</span>
+      <span class="setup-desc">Set minimum jumlah react ⭐ untuk masuk starboard (default: 5)</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════════════
+       LEADERBOARD
+  ════════════════════════════════════════ -->
+  <div class="section-title">🏆 Leaderboard</div>
+
+  <div class="embed-mockup" style="border-left-color:#ffd700">
+    <div style="font-size:15px;font-weight:700;color:#f2f3f5;margin-bottom:12px">⭐ Starboard Leaderboard</div>
+    <div style="font-size:13px;color:#dcddde;line-height:2">
+      🥇 <span style="color:#7289da">@Piaro</span> — <strong>5</strong> pesan<br>
+      🥈 <span style="color:#7289da">@Lazabel</span> — <strong>3</strong> pesan<br>
+      🥉 <span style="color:#7289da">@Dys</span> — <strong>2</strong> pesan<br>
+      <span style="color:#949ba4">4.</span> <span style="color:#7289da">@Karbiter</span> — <strong>1</strong> pesan
+    </div>
+    <div class="embed-footer">Ranking berdasarkan jumlah pesan yang masuk starboard</div>
+  </div>
+
+  <div style="text-align:center;color:#4e5058;font-size:11px;margin-top:40px">
+    Celestial Bot · Starboard Feature · 2026
+  </div>
+
+</div>
+
+</body>
+</html>

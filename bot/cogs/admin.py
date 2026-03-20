@@ -20,6 +20,30 @@ from config import (
 )
 
 
+class AnnounceModal(discord.ui.Modal, title="📢 Buat Pengumuman"):
+    judul = discord.ui.TextInput(label="Judul", required=True, max_length=200)
+    isi = discord.ui.TextInput(
+        label="Isi", style=discord.TextStyle.paragraph, required=True, max_length=2000
+    )
+    warna = discord.ui.TextInput(
+        label="Warna (gold/green/blue/red)", required=False, default="blue", max_length=10
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        colors = {"gold": 0xffd700, "green": 0x2ecc71, "blue": 0x5865f2, "red": 0xed4245}
+        color = colors.get(self.warna.value.strip().lower(), 0x5865f2)
+
+        embed = discord.Embed(
+            title=self.judul.value,
+            description=self.isi.value,
+            color=color,
+        )
+        embed.set_footer(text="✦ Celestial Server")
+
+        await interaction.channel.send(embed=embed)
+        await interaction.response.send_message("✅ Pengumuman berhasil di-post.", ephemeral=True)
+
+
 class GuildInfoModal(discord.ui.Modal, title="✦ Set Info Guild"):
     def __init__(self, guild_name: str, tipe: str, current):
         super().__init__()
@@ -648,6 +672,11 @@ class AdminCog(commands.Cog):
                 ephemeral=True,
             )
 
+    @app_commands.command(name="announce", description="[Admin] Post pengumuman ke channel ini")
+    @app_commands.default_permissions(manage_channels=True)
+    async def announce(self, interaction: discord.Interaction):
+        await interaction.response.send_modal(AnnounceModal())
+
     @app_commands.command(name="help", description="Lihat daftar semua command bot")
     async def help_command(self, interaction: discord.Interaction):
         embed = discord.Embed(title="✦ Celestial Bot — Command List", color=0x5865f2)
@@ -693,6 +722,7 @@ class AdminCog(commands.Cog):
                 "`/profile-list` — Force refresh daftar member\n"
                 "`/admin-edit <member>` — Edit akun user\n"
                 "`/admin-unregister <member>` — Hapus akun user\n"
+                "`/announce` — Post pengumuman ke channel\n"
                 "`/changelog` — Post changelog ke channel\n"
                 "`/bot-status` — Status bot & statistik"
             ),

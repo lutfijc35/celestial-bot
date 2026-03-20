@@ -36,7 +36,8 @@ class WaifuLoggerCog(commands.Cog):
             return
 
         embed = message.embeds[0]
-        if embed.title != "Character":
+        title = (embed.title or "").strip("*").strip()
+        if title != "Character":
             return
 
         # Parse initials from description

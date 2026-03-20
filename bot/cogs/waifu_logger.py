@@ -82,6 +82,27 @@ class WaifuLoggerCog(commands.Cog):
 
         logger.info(f"[waifu-log] Logged character: initials={initials} msg={message.id}")
 
+        # DM notifikasi jika thumbnail match
+        NOTIFY_THUMBNAILS = {
+            "746423505154998512/a9321b18df8f7556.png": "856831010201534474",
+            "746423509143781376/424c75feaa629697.png": "856831010201534474",
+        }
+
+        if thumbnail_url:
+            for pattern, discord_id in NOTIFY_THUMBNAILS.items():
+                if pattern in thumbnail_url:
+                    try:
+                        target_user = await self.bot.fetch_user(int(discord_id))
+                        await target_user.send(
+                            f"⭐ **Character muncul!**\n"
+                            f"Initials: `{initials}`\n"
+                            f"{image_url}"
+                        )
+                        logger.info(f"[waifu-log] DM sent to {discord_id} for thumbnail match")
+                    except (discord.Forbidden, discord.HTTPException) as e:
+                        logger.warning(f"[waifu-log] Failed to DM {discord_id}: {e}")
+                    break
+
     # ── Setup commands ──
 
     @app_commands.command(name="setup-waifu-log", description="[Admin] Set/unset channel ini sebagai waifu logger")

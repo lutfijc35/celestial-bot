@@ -16,6 +16,7 @@ from bot.cogs.register import RegisterCog, ApprovalView, RegisterButton
 from bot.cogs.admin import AdminCog
 from bot.cogs.profile import ProfileCog
 from bot.cogs.starboard import StarboardCog
+from bot.cogs.waifu_logger import WaifuLoggerCog
 
 logging.basicConfig(
     level=logging.INFO,
@@ -76,6 +77,7 @@ async def on_ready():
     await bot.add_cog(AdminCog(bot))
     await bot.add_cog(ProfileCog(bot))
     await bot.add_cog(StarboardCog(bot))
+    await bot.add_cog(WaifuLoggerCog(bot))
 
     # Re-register persistent views (agar button tetap berfungsi setelah restart)
     bot.add_view(ApprovalView())

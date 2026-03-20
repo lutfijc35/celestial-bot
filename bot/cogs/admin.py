@@ -709,6 +709,14 @@ class AdminCog(commands.Cog):
             ),
             inline=False,
         )
+        embed.add_field(
+            name="📋 Waifu Logger",
+            value=(
+                "`/setup-waifu-log` — Set/unset channel logger\n"
+                "`/setup-waifu-bot <bot>` — Set bot yang dimonitor"
+            ),
+            inline=False,
+        )
         embed.set_footer(text="<wajib> · [opsional] · Admin commands perlu permission khusus")
 
         await interaction.response.send_message(embed=embed, ephemeral=True)

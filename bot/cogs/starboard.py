@@ -9,7 +9,7 @@ from bot.utils.database import (
     get_starboard_entry, create_starboard_entry,
     update_starboard_star_count, get_expired_starboard_roles,
     mark_starboard_role_removed, get_starboard_leaderboard,
-    get_setting, set_setting,
+    get_setting, set_setting, delete_setting,
 )
 from config import GUILD_ID
 
@@ -186,23 +186,33 @@ class StarboardCog(commands.Cog):
     @app_commands.default_permissions(manage_channels=True)
     async def setup_starboard(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        await set_setting("starboard_channel_id", str(interaction.channel.id))
-        self.starboard_channel_id = interaction.channel.id
-        await interaction.followup.send(
-            f"✅ Starboard channel diset ke <#{interaction.channel.id}>.",
-            ephemeral=True,
-        )
+        current = await get_setting("starboard_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("starboard_channel_id")
+            self.starboard_channel_id = 0
+            await interaction.followup.send("❌ Starboard channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("starboard_channel_id", str(interaction.channel.id))
+            self.starboard_channel_id = interaction.channel.id
+            await interaction.followup.send(
+                f"✅ Starboard channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
 
     @app_commands.command(name="setup-starboard-source", description="[Admin] Set channel ini sebagai sumber starboard")
     @app_commands.default_permissions(manage_channels=True)
     async def setup_starboard_source(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        await set_setting("starboard_source_channel_id", str(interaction.channel.id))
-        self.source_channel_id = interaction.channel.id
-        await interaction.followup.send(
-            f"✅ Starboard source channel diset ke <#{interaction.channel.id}>.",
-            ephemeral=True,
-        )
+        current = await get_setting("starboard_source_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("starboard_source_channel_id")
+            self.source_channel_id = 0
+            await interaction.followup.send("❌ Starboard source channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("starboard_source_channel_id", str(interaction.channel.id))
+            self.source_channel_id = interaction.channel.id
+            await interaction.followup.send(
+                f"✅ Starboard source channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
 
     @app_commands.command(name="setup-starboard-role", description="[Admin] Set role sementara untuk starboard (30 hari)")
     @app_commands.default_permissions(manage_roles=True)

@@ -6,7 +6,7 @@ from discord import app_commands
 from discord.ext import commands
 from bot.utils.database import (
     upsert_guild_role, update_guild_info, delete_guild_role, get_guild_role,
-    get_all_guild_roles, set_setting, get_setting,
+    get_all_guild_roles, set_setting, get_setting, delete_setting,
     get_accounts_by_discord_id, get_account, delete_account,
     get_account_stats, get_guild_count,
     update_account_fields, check_nickname_exists,
@@ -435,51 +435,64 @@ class AdminCog(commands.Cog):
     @app_commands.default_permissions(manage_channels=True)
     async def setup_profile(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        await set_setting("profile_channel_id", str(interaction.channel.id))
-        await update_member_list(interaction.client)
-        await interaction.followup.send(
-            "✅ Channel profile berhasil diset dan daftar member sudah di-post.",
-            ephemeral=True,
-        )
+        current = await get_setting("profile_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("profile_channel_id")
+            await interaction.followup.send("❌ Profile channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("profile_channel_id", str(interaction.channel.id))
+            await update_member_list(interaction.client)
+            await interaction.followup.send(
+                f"✅ Profile channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
 
     @app_commands.command(name="setup-welcome", description="[Admin] Set channel ini sebagai welcome channel")
     @app_commands.default_permissions(manage_channels=True)
     async def setup_welcome(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-
-        await set_setting("welcome_channel_id", str(interaction.channel.id))
-        interaction.client.welcome_channel_id = interaction.channel.id
-
-        await interaction.followup.send(
-            f"✅ Welcome channel berhasil diset ke <#{interaction.channel.id}>.",
-            ephemeral=True,
-        )
+        current = await get_setting("welcome_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("welcome_channel_id")
+            interaction.client.welcome_channel_id = 0
+            await interaction.followup.send("❌ Welcome channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("welcome_channel_id", str(interaction.channel.id))
+            interaction.client.welcome_channel_id = interaction.channel.id
+            await interaction.followup.send(
+                f"✅ Welcome channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
 
     @app_commands.command(name="setup-register-here", description="[Admin] Set channel ini sebagai register channel (dibuka setelah react rules)")
     @app_commands.default_permissions(manage_channels=True)
     async def setup_register_here(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-
-        await set_setting("register_channel_id", str(interaction.channel.id))
-        interaction.client.register_channel_id = interaction.channel.id
-
-        await interaction.followup.send(
-            f"✅ Register channel berhasil diset ke <#{interaction.channel.id}>.",
-            ephemeral=True,
-        )
+        current = await get_setting("register_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("register_channel_id")
+            interaction.client.register_channel_id = 0
+            await interaction.followup.send("❌ Register channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("register_channel_id", str(interaction.channel.id))
+            interaction.client.register_channel_id = interaction.channel.id
+            await interaction.followup.send(
+                f"✅ Register channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
 
     @app_commands.command(name="setup-other-games", description="[Admin] Set channel ini sebagai other-games channel (dibuka setelah react rules)")
     @app_commands.default_permissions(manage_channels=True)
     async def setup_other_games(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-
-        await set_setting("other_games_channel_id", str(interaction.channel.id))
-        interaction.client.other_games_channel_id = interaction.channel.id
-
-        await interaction.followup.send(
-            f"✅ Other-games channel berhasil diset ke <#{interaction.channel.id}>.",
-            ephemeral=True,
-        )
+        current = await get_setting("other_games_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("other_games_channel_id")
+            interaction.client.other_games_channel_id = 0
+            await interaction.followup.send("❌ Other-games channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("other_games_channel_id", str(interaction.channel.id))
+            interaction.client.other_games_channel_id = interaction.channel.id
+            await interaction.followup.send(
+                f"✅ Other-games channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
 
     @app_commands.command(name="setup-approval-ping", description="[Admin] Toggle role yang di-ping saat ada approval request")
     @app_commands.default_permissions(manage_roles=True)
@@ -509,11 +522,15 @@ class AdminCog(commands.Cog):
     @app_commands.default_permissions(manage_channels=True)
     async def setup_changelog(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        await set_setting("changelog_channel_id", str(interaction.channel.id))
-        await interaction.followup.send(
-            f"✅ Changelog channel diset ke <#{interaction.channel.id}>.",
-            ephemeral=True,
-        )
+        current = await get_setting("changelog_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("changelog_channel_id")
+            await interaction.followup.send("❌ Changelog channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("changelog_channel_id", str(interaction.channel.id))
+            await interaction.followup.send(
+                f"✅ Changelog channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
 
     @app_commands.command(name="changelog", description="[Admin] Post changelog dari git commits terbaru")
     @app_commands.default_permissions(manage_guild=True)

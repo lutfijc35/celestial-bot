@@ -334,6 +334,12 @@ async def get_setting(key: str) -> str | None:
             return row[0] if row else None
 
 
+async def delete_setting(key: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("DELETE FROM bot_settings WHERE key = ?", (key,))
+        await db.commit()
+
+
 async def set_setting(key: str, value: str):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(

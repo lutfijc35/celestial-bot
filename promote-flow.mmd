@@ -1,0 +1,22 @@
+flowchart TD
+    A["👑 Admin ketik /promote"] --> B["📝 Modal: Judul, Deskripsi, Harga"]
+    B --> C["💼 Bot post embed promosi\n+ tombol 📩 Saya Tertarik"]
+
+    C --> D["👤 User klik tombol\n📩 Saya Tertarik"]
+    D --> E["📝 Modal: IGN, Detail Request, Budget"]
+    E --> F{"Submit?"}
+
+    F -- Cancel --> C
+    F -- Submit --> G["📋 Bot kirim embed request\nke #task-joki + mention @Role"]
+    G --> H["📨 Bot DM user:\nRequest sudah dikirim"]
+    H --> I["✅ Admin review\ndi #task-joki"]
+
+    style A fill:#3c4270,stroke:#5865f2,color:#c9cdf7
+    style B fill:#3c4270,stroke:#5865f2,color:#c9cdf7
+    style C fill:#3d3117,stroke:#ffd700,color:#ffe066
+    style D fill:#3c4270,stroke:#5865f2,color:#c9cdf7
+    style E fill:#3c4270,stroke:#5865f2,color:#c9cdf7
+    style F fill:#3d3117,stroke:#faa61a,color:#f9d77a
+    style G fill:#3d3117,stroke:#ffa500,color:#ffc966
+    style H fill:#1a3d2b,stroke:#3ba55c,color:#79cf8e
+    style I fill:#1a3d2b,stroke:#3ba55c,color:#79cf8e

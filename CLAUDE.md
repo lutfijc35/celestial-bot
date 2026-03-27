@@ -73,6 +73,12 @@ celestial/
 | `/setup-approval-ping <@role>` | Toggle role yang di-ping saat ada approval request |
 | `/setup-changelog` | Set channel ini sebagai changelog channel |
 | `/changelog` | Post changelog dari git commits terbaru |
+| `/announce` | Post pengumuman fleksibel via modal (judul, isi, warna) |
+| `/promote` | Post promosi dengan button "Saya Tertarik" |
+| `/setup-task-channel` | Set channel task/joki (toggle) |
+| `/setup-task-role <@role>` | Set role yang di-ping saat ada task request |
+| `/setup-waifu-log` | Set/unset channel waifu logger (toggle) |
+| `/setup-waifu-bot <@bot>` | Set bot yang dimonitor untuk waifu logger |
 | `/help` | Lihat daftar semua command bot |
 
 ### Starboard Commands

@@ -1527,6 +1527,36 @@ docker-compose down</div>
         <span>Post changelog dari git commits terbaru ke channel changelog. Otomatis track commits baru saja</span>
       </div>
       <div class="extras-item">
+        <span class="cmd">/announce</span>
+        <span style="color:#949ba4">—</span>
+        <span>Post pengumuman fleksibel ke channel ini via modal (judul, isi, warna)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/promote</span>
+        <span style="color:#949ba4">—</span>
+        <span>Post promosi dengan button "Saya Tertarik". User klik → form → request masuk ke task channel</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/setup-task-channel</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set/unset channel ini sebagai task channel (tempat request masuk)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/setup-task-role @role</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set role yang di-mention saat ada task request baru masuk</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/setup-waifu-log</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set/unset channel ini untuk log embed bot Waifugami (log rotation per minggu)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/setup-waifu-bot @bot</span>
+        <span style="color:#949ba4">—</span>
+        <span>Set bot yang dimonitor untuk waifu logger</span>
+      </div>
+      <div class="extras-item">
         <span class="cmd">/setup-starboard</span>
         <span style="color:#949ba4">—</span>
         <span>Set channel ini sebagai starboard target (tempat repost pesan bintang)</span>
@@ -1637,6 +1667,29 @@ docker-compose down</div>
           <strong style="color:#f2f3f5">Remove guild</strong> —
           Jalankan <span class="cmd">/remove-guild</span> → pilih guild → guild terhapus dari database,
           <span class="cmd">#guild-list</span> ter-update otomatis
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Promosi</strong> —
+          Jalankan <span class="cmd">/promote</span> → isi form → embed muncul dengan button →
+          user klik → isi request → embed masuk ke <span class="cmd">#task-joki</span> + mention role
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Waifu logger</strong> —
+          Jalankan <span class="cmd">/setup-waifu-log</span> + <span class="cmd">/setup-waifu-bot @Waifugami</span> →
+          tunggu bot Waifugami post → cek file log di <span class="cmd">data/waifu-log/</span>
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Announce</strong> —
+          Jalankan <span class="cmd">/announce</span> → isi judul + isi + warna → embed pengumuman muncul di channel
         </span>
       </div>
       <div class="checklist-item">

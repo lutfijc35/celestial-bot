@@ -77,6 +77,7 @@ celestial/
 | `/promote` | Post promosi dengan button "Saya Tertarik" |
 | `/setup-task-channel` | Set channel task/joki (toggle) |
 | `/setup-task-role <@role>` | Set role yang di-ping saat ada task request |
+| `/close-task` | Tutup task, save transcript, hapus private channel |
 | `/setup-waifu-log` | Set/unset channel waifu logger (toggle) |
 | `/setup-waifu-bot <@bot>` | Set bot yang dimonitor untuk waifu logger |
 | `/help` | Lihat daftar semua command bot |

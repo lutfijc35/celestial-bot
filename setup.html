@@ -1547,6 +1547,21 @@ docker-compose down</div>
         <span>Set role yang di-mention saat ada task request baru masuk</span>
       </div>
       <div class="extras-item">
+        <span class="cmd">/close-task</span>
+        <span style="color:#949ba4">—</span>
+        <span>Tutup task: save transcript chat, kirim summary, hapus private channel</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/admin-edit @user</span>
+        <span style="color:#949ba4">—</span>
+        <span>Edit akun game milik user tertentu (server, guild, nickname)</span>
+      </div>
+      <div class="extras-item">
+        <span class="cmd">/bot-status</span>
+        <span style="color:#949ba4">—</span>
+        <span>Lihat uptime, latency, statistik akun, jumlah guild, dan semua konfigurasi aktif</span>
+      </div>
+      <div class="extras-item">
         <span class="cmd">/setup-waifu-log</span>
         <span style="color:#949ba4">—</span>
         <span>Set/unset channel ini untuk log embed bot Waifugami (log rotation per minggu)</span>
@@ -1705,6 +1720,28 @@ docker-compose down</div>
         <span>
           <strong style="color:#f2f3f5">Leaderboard</strong> —
           Jalankan <span class="cmd">/leaderboard</span> → embed ranking top 10 user starboard tampil
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Task assign + close</strong> —
+          User klik tertarik → admin assign joki → private channel dibuat →
+          <span class="cmd">/close-task</span> → transcript tersimpan, channel dihapus, pesan request di-mark Closed
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Admin edit</strong> —
+          Jalankan <span class="cmd">/admin-edit @user</span> → modal edit terbuka → ubah data → guild list + member list ter-update
+        </span>
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✅</span>
+        <span>
+          <strong style="color:#f2f3f5">Bot status</strong> —
+          Jalankan <span class="cmd">/bot-status</span> → embed tampilkan uptime, latency, statistik, semua channel + role + starboard config
         </span>
       </div>
     </div>

@@ -416,6 +416,24 @@ class PromoteCog(commands.Cog):
 
         logger.info(f"[task] Transcript saved: {transcript_path}")
 
+        # Edit pesan request asli di #task-joki — mark as closed
+        task_ch_id = await get_setting("task_channel_id")
+        if task_ch_id and task["request_msg_id"]:
+            task_channel = interaction.client.get_channel(int(task_ch_id))
+            if task_channel:
+                try:
+                    req_msg = await task_channel.fetch_message(int(task["request_msg_id"]))
+                    if req_msg.embeds:
+                        embed_edit = req_msg.embeds[0]
+                        embed_edit.color = discord.Color.dark_grey()
+                        embed_edit.title = f"📋 Task #{task['id']} — Closed"
+                    view = discord.ui.View()
+                    btn = discord.ui.Button(label="Closed", style=discord.ButtonStyle.secondary, disabled=True, emoji="🔒")
+                    view.add_item(btn)
+                    await req_msg.edit(embed=embed_edit, view=view)
+                except (discord.NotFound, discord.HTTPException):
+                    pass
+
         # Send summary to #task-joki
         task_ch_id = await get_setting("task_channel_id")
         if task_ch_id:

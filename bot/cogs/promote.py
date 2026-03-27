@@ -354,10 +354,25 @@ class PromoteCog(commands.Cog):
             f"✅ Task role diset ke {role.mention}.", ephemeral=True
         )
 
-    @app_commands.command(name="close-task", description="[Admin] Tutup task dan hapus channel ini")
-    @app_commands.default_permissions(manage_channels=True)
+    @app_commands.command(name="close-task", description="Tutup task dan hapus channel ini")
     async def close_task(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
+
+        # Cek permission: manage_channels ATAU punya task role
+        task_role_id = await get_setting("task_role_id")
+        has_task_role = False
+        if task_role_id and interaction.guild:
+            role = interaction.guild.get_role(int(task_role_id))
+            if role and role in interaction.user.roles:
+                has_task_role = True
+
+        has_manage = interaction.user.guild_permissions.manage_channels if interaction.guild else False
+
+        if not has_task_role and not has_manage:
+            await interaction.followup.send(
+                "❌ Kamu tidak punya permission untuk menutup task.", ephemeral=True
+            )
+            return
 
         task = await get_active_task_by_channel(str(interaction.channel.id))
         if not task:

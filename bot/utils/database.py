@@ -71,6 +71,22 @@ async def init_db():
                 role_removed         INTEGER NOT NULL DEFAULT 0,
                 created_at           DATETIME DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS active_tasks (
+                id               INTEGER PRIMARY KEY AUTOINCREMENT,
+                requester_id     TEXT NOT NULL,
+                requester_ign    TEXT NOT NULL,
+                promo_title      TEXT NOT NULL,
+                detail           TEXT NOT NULL,
+                budget           TEXT,
+                joki_id          TEXT,
+                channel_id       TEXT,
+                request_msg_id   TEXT,
+                status           TEXT NOT NULL DEFAULT 'open',
+                created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+                assigned_at      DATETIME,
+                closed_at        DATETIME
+            );
         """)
         await db.commit()
 
@@ -448,3 +464,63 @@ async def get_starboard_leaderboard(limit: int = 10):
             (limit,)
         ) as cur:
             return await cur.fetchall()
+
+
+# ── Active Tasks ──────────────────────────────────────────────────
+
+async def create_active_task(
+    requester_id: str, requester_ign: str, promo_title: str,
+    detail: str, budget: str | None, request_msg_id: str,
+) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """INSERT INTO active_tasks
+               (requester_id, requester_ign, promo_title, detail, budget, request_msg_id)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (requester_id, requester_ign, promo_title, detail, budget, request_msg_id)
+        ) as cur:
+            task_id = cur.lastrowid
+        await db.commit()
+        return task_id
+
+
+async def get_active_task(task_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM active_tasks WHERE id = ?", (task_id,)
+        ) as cur:
+            return await cur.fetchone()
+
+
+async def get_active_task_by_channel(channel_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM active_tasks WHERE channel_id = ? AND status = 'assigned'",
+            (channel_id,)
+        ) as cur:
+            return await cur.fetchone()
+
+
+async def update_task_assign(task_id: int, joki_id: str, channel_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """UPDATE active_tasks
+               SET joki_id = ?, channel_id = ?, status = 'assigned',
+                   assigned_at = CURRENT_TIMESTAMP
+               WHERE id = ?""",
+            (joki_id, channel_id, task_id)
+        )
+        await db.commit()
+
+
+async def update_task_closed(task_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """UPDATE active_tasks
+               SET status = 'closed', closed_at = CURRENT_TIMESTAMP
+               WHERE id = ?""",
+            (task_id,)
+        )
+        await db.commit()

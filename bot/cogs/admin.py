@@ -744,7 +744,8 @@ class AdminCog(commands.Cog):
             value=(
                 "`/promote` — Post promosi + tombol tertarik\n"
                 "`/setup-task-channel` — Set task channel\n"
-                "`/setup-task-role <role>` — Set role ping task"
+                "`/setup-task-role <role>` — Set role ping task\n"
+                "`/close-task` — Tutup task + hapus channel"
             ),
             inline=False,
         )

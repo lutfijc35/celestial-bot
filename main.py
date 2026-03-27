@@ -17,7 +17,7 @@ from bot.cogs.admin import AdminCog
 from bot.cogs.profile import ProfileCog
 from bot.cogs.starboard import StarboardCog
 from bot.cogs.waifu_logger import WaifuLoggerCog
-from bot.cogs.promote import PromoteCog, TaskInterestButton
+from bot.cogs.promote import PromoteCog, TaskInterestButton, TaskAssignView
 
 logging.basicConfig(
     level=logging.INFO,
@@ -85,6 +85,7 @@ async def on_ready():
     bot.add_view(ApprovalView())
     bot.add_view(RegisterButton())
     bot.add_view(TaskInterestButton())
+    bot.add_view(TaskAssignView())
 
     # Sync slash commands ke guild
     guild = discord.Object(id=GUILD_ID)

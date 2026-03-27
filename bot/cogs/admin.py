@@ -740,6 +740,15 @@ class AdminCog(commands.Cog):
             inline=False,
         )
         embed.add_field(
+            name="💼 Promosi",
+            value=(
+                "`/promote` — Post promosi + tombol tertarik\n"
+                "`/setup-task-channel` — Set task channel\n"
+                "`/setup-task-role <role>` — Set role ping task"
+            ),
+            inline=False,
+        )
+        embed.add_field(
             name="📋 Waifu Logger",
             value=(
                 "`/setup-waifu-log` — Set/unset channel logger\n"

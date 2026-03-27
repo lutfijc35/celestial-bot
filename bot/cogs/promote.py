@@ -381,6 +381,41 @@ class PromoteCog(commands.Cog):
             )
             return
 
+        # Save transcript
+        transcript_lines = []
+        transcript_lines.append(f"=== Transcript Task #{task['id']} ===")
+        transcript_lines.append(f"Requester: {task['requester_id']} (IGN: {task['requester_ign']})")
+        transcript_lines.append(f"Joki: {task['joki_id'] or '—'}")
+        transcript_lines.append(f"Promosi: {task['promo_title']}")
+        transcript_lines.append(f"Detail: {task['detail']}")
+        transcript_lines.append(f"Budget: {task['budget'] or '—'}")
+        transcript_lines.append(f"Created: {task['created_at']}")
+        transcript_lines.append(f"Closed by: {interaction.user} ({interaction.user.id})")
+        transcript_lines.append("")
+        transcript_lines.append("=== Chat Log ===")
+
+        async for msg in interaction.channel.history(limit=None, oldest_first=True):
+            timestamp = msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            author = f"{msg.author.display_name} ({msg.author.id})"
+            content = msg.content or ""
+            if msg.embeds:
+                content += " [embed]"
+            if msg.attachments:
+                urls = ", ".join(a.url for a in msg.attachments)
+                content += f" [attachments: {urls}]"
+            transcript_lines.append(f"[{timestamp}] {author}: {content}")
+
+        # Save to data/task-transcripts/task-{id}.txt
+        import os
+        transcript_dir = os.path.join("data", "task-transcripts")
+        os.makedirs(transcript_dir, exist_ok=True)
+        transcript_path = os.path.join(transcript_dir, f"task-{task['id']}.txt")
+
+        with open(transcript_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(transcript_lines))
+
+        logger.info(f"[task] Transcript saved: {transcript_path}")
+
         # Send summary to #task-joki
         task_ch_id = await get_setting("task_channel_id")
         if task_ch_id:
@@ -407,6 +442,7 @@ class PromoteCog(commands.Cog):
                 summary.add_field(name="Joki", value=f"<@{task['joki_id']}>" if task["joki_id"] else "—", inline=True)
                 summary.add_field(name="Durasi", value=f"`{duration}`", inline=True)
                 summary.add_field(name="Promosi", value=task["promo_title"], inline=True)
+                summary.add_field(name="Transcript", value=f"`{transcript_path}`", inline=False)
                 summary.set_footer(text=f"Closed by {interaction.user.display_name}")
 
                 await task_channel.send(embed=summary)
@@ -414,7 +450,7 @@ class PromoteCog(commands.Cog):
         # Update DB
         await update_task_closed(task["id"])
 
-        await interaction.followup.send("✅ Task closed. Channel akan dihapus dalam 5 detik...", ephemeral=True)
+        await interaction.followup.send("✅ Task closed. Transcript tersimpan. Channel akan dihapus dalam 5 detik...", ephemeral=True)
 
         # Delete channel
         import asyncio

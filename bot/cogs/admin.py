@@ -25,6 +25,12 @@ class AnnounceModal(discord.ui.Modal, title="📢 Buat Pengumuman"):
     isi = discord.ui.TextInput(
         label="Isi", style=discord.TextStyle.paragraph, required=True, max_length=2000
     )
+    mention = discord.ui.TextInput(
+        label="Mention (opsional: @everyone, @here, role ID)",
+        required=False,
+        max_length=100,
+        placeholder="@everyone atau @here atau kosongkan",
+    )
     warna = discord.ui.TextInput(
         label="Warna (gold/green/blue/red)", required=False, default="blue", max_length=10
     )
@@ -40,7 +46,8 @@ class AnnounceModal(discord.ui.Modal, title="📢 Buat Pengumuman"):
         )
         embed.set_footer(text="✦ Celestial Server")
 
-        await interaction.channel.send(embed=embed)
+        content = self.mention.value.strip() or None
+        await interaction.channel.send(content=content, embed=embed)
         await interaction.response.send_message("✅ Pengumuman berhasil di-post.", ephemeral=True)
 
 

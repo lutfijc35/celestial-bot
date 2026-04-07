@@ -9,6 +9,8 @@ from bot.utils.database import (
     get_starboard_entry, create_starboard_entry,
     update_starboard_star_count, get_expired_starboard_roles,
     mark_starboard_role_removed, get_starboard_leaderboard,
+    get_starboard_leaderboard_monthly, get_monthly_starboard_count,
+    check_mvp_notified, mark_mvp_notified,
     get_setting, set_setting, delete_setting,
 )
 from config import GUILD_ID
@@ -18,6 +20,13 @@ logger = logging.getLogger("celestial")
 STAR_EMOJI = "⭐"
 DEFAULT_THRESHOLD = 5
 ROLE_DURATION_DAYS = 30
+MVP_THRESHOLD = 5
+WIB = timezone(timedelta(hours=7))
+BULAN_ID = {
+    1: "Januari", 2: "Februari", 3: "Maret", 4: "April",
+    5: "Mei", 6: "Juni", 7: "Juli", 8: "Agustus",
+    9: "September", 10: "Oktober", 11: "November", 12: "Desember",
+}
 
 
 class StarboardCog(commands.Cog):
@@ -40,6 +49,12 @@ class StarboardCog(commands.Cog):
 
         threshold = await get_setting("starboard_threshold")
         self.star_threshold = int(threshold) if threshold else DEFAULT_THRESHOLD
+
+        mvp_ch = await get_setting("mvp_channel_id")
+        self.mvp_channel_id = int(mvp_ch) if mvp_ch else 0
+
+        mvp_img = await get_setting("mvp_image_url")
+        self.mvp_image_url = mvp_img or ""
 
         self.check_role_expiry.start()
 
@@ -180,6 +195,31 @@ class StarboardCog(commands.Cog):
         )
         logger.info(f"[starboard] Message {message.id} by {message.author} starboarded ({star_count} stars)")
 
+        # MVP check — jika user masuk starboard >= 5x bulan ini (WIB)
+        if self.mvp_channel_id:
+            now_wib = datetime.now(WIB)
+            author_id = str(message.author.id)
+            monthly_count = await get_monthly_starboard_count(author_id, now_wib.year, now_wib.month)
+            if monthly_count >= MVP_THRESHOLD:
+                already = await check_mvp_notified(author_id, now_wib.year, now_wib.month)
+                if not already:
+                    mvp_ch = self.bot.get_channel(self.mvp_channel_id)
+                    if mvp_ch:
+                        embed = discord.Embed(
+                            title="🏆 Sahabat Hitam!",
+                            description=(
+                                f"Selamat {message.author.mention}! "
+                                f"Kamu menjadi sahabat hitam, sering-sering jadi orang hitam ya 😎\n\n"
+                                f"⭐ **{monthly_count}x** masuk starboard bulan {BULAN_ID[now_wib.month]} {now_wib.year}"
+                            ),
+                            color=0xffd700,
+                        )
+                        if self.mvp_image_url:
+                            embed.set_image(url=self.mvp_image_url)
+                        await mvp_ch.send(content=message.author.mention, embed=embed)
+                        await mark_mvp_notified(author_id, now_wib.year, now_wib.month)
+                        logger.info(f"[starboard] MVP notification sent for {message.author}")
+
     # ── Setup commands ──
 
     @app_commands.command(name="setup-starboard", description="[Admin] Set channel ini sebagai starboard target")
@@ -239,28 +279,65 @@ class StarboardCog(commands.Cog):
             ephemeral=True,
         )
 
+    @app_commands.command(name="setup-mvp-channel", description="[Admin] Set/unset channel untuk notifikasi MVP bulanan")
+    @app_commands.default_permissions(manage_channels=True)
+    async def setup_mvp_channel(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        current = await get_setting("mvp_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("mvp_channel_id")
+            self.mvp_channel_id = 0
+            await interaction.followup.send("❌ MVP channel dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("mvp_channel_id", str(interaction.channel.id))
+            self.mvp_channel_id = interaction.channel.id
+            await interaction.followup.send(
+                f"✅ MVP channel diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
+
+    @app_commands.command(name="setup-mvp-image", description="[Admin] Set URL gambar untuk notifikasi MVP")
+    @app_commands.default_permissions(manage_channels=True)
+    async def setup_mvp_image(self, interaction: discord.Interaction, url: str):
+        await interaction.response.defer(ephemeral=True)
+        await set_setting("mvp_image_url", url.strip())
+        self.mvp_image_url = url.strip()
+        await interaction.followup.send(f"✅ MVP image diset.", ephemeral=True)
+
     # ── Leaderboard ──
 
     @app_commands.command(name="leaderboard", description="Lihat top 10 user dengan pesan paling banyak di starboard")
     async def leaderboard(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
 
-        rows = await get_starboard_leaderboard(10)
-        if not rows:
+        medals = ["🥇", "🥈", "🥉"]
+
+        def format_ranks(rows):
+            lines = []
+            for i, row in enumerate(rows):
+                prefix = medals[i] if i < 3 else f"{i + 1}."
+                lines.append(f"{prefix} <@{row[0]}> — **{row[1]}** pesan")
+            return "\n".join(lines)
+
+        now_wib = datetime.now(WIB)
+        month_label = f"{BULAN_ID[now_wib.month]} {now_wib.year}"
+
+        monthly = await get_starboard_leaderboard_monthly(now_wib.year, now_wib.month, 10)
+        all_time = await get_starboard_leaderboard(10)
+
+        if not monthly and not all_time:
             await interaction.followup.send("Belum ada pesan yang masuk starboard.", ephemeral=True)
             return
 
-        medals = ["🥇", "🥈", "🥉"]
-        lines = []
-        for i, row in enumerate(rows):
-            prefix = medals[i] if i < 3 else f"{i + 1}."
-            lines.append(f"{prefix} <@{row[0]}> — **{row[1]}** pesan")
+        embed = discord.Embed(title="⭐ Starboard Leaderboard", color=0xffd700)
 
-        embed = discord.Embed(
-            title="⭐ Starboard Leaderboard",
-            description="\n".join(lines),
-            color=0xffd700,
-        )
+        if monthly:
+            embed.add_field(name=f"⭐ {month_label}", value=format_ranks(monthly), inline=False)
+        else:
+            embed.add_field(name=f"⭐ {month_label}", value="*Belum ada data bulan ini*", inline=False)
+
+        if all_time:
+            embed.add_field(name="🏆 All Time", value=format_ranks(all_time), inline=False)
+
         embed.set_footer(text="Ranking berdasarkan jumlah pesan yang masuk starboard")
 
         await interaction.followup.send(embed=embed)

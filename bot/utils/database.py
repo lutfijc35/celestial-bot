@@ -72,6 +72,14 @@ async def init_db():
                 created_at           DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS starboard_mvp_notified (
+                author_discord_id TEXT NOT NULL,
+                year              INTEGER NOT NULL,
+                month             INTEGER NOT NULL,
+                notified_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (author_discord_id, year, month)
+            );
+
             CREATE TABLE IF NOT EXISTS active_tasks (
                 id               INTEGER PRIMARY KEY AUTOINCREMENT,
                 requester_id     TEXT NOT NULL,
@@ -464,6 +472,60 @@ async def get_starboard_leaderboard(limit: int = 10):
             (limit,)
         ) as cur:
             return await cur.fetchall()
+
+
+async def get_starboard_leaderboard_monthly(year: int, month: int, limit: int = 10):
+    start = f"{year:04d}-{month:02d}-01"
+    if month == 12:
+        end = f"{year + 1:04d}-01-01"
+    else:
+        end = f"{year:04d}-{month + 1:02d}-01"
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT author_discord_id, COUNT(*) as count
+               FROM starboard_entries
+               WHERE created_at >= ? AND created_at < ?
+               GROUP BY author_discord_id
+               ORDER BY count DESC
+               LIMIT ?""",
+            (start, end, limit)
+        ) as cur:
+            return await cur.fetchall()
+
+
+async def get_monthly_starboard_count(author_id: str, year: int, month: int) -> int:
+    start = f"{year:04d}-{month:02d}-01"
+    if month == 12:
+        end = f"{year + 1:04d}-01-01"
+    else:
+        end = f"{year:04d}-{month + 1:02d}-01"
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT COUNT(*) FROM starboard_entries
+               WHERE author_discord_id = ? AND created_at >= ? AND created_at < ?""",
+            (author_id, start, end)
+        ) as cur:
+            row = await cur.fetchone()
+            return row[0] if row else 0
+
+
+async def check_mvp_notified(author_id: str, year: int, month: int) -> bool:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "SELECT 1 FROM starboard_mvp_notified WHERE author_discord_id = ? AND year = ? AND month = ?",
+            (author_id, year, month)
+        ) as cur:
+            return await cur.fetchone() is not None
+
+
+async def mark_mvp_notified(author_id: str, year: int, month: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """INSERT OR IGNORE INTO starboard_mvp_notified (author_discord_id, year, month)
+               VALUES (?, ?, ?)""",
+            (author_id, year, month)
+        )
+        await db.commit()
 
 
 # ── Active Tasks ──────────────────────────────────────────────────

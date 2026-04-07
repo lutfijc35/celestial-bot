@@ -735,7 +735,9 @@ class AdminCog(commands.Cog):
                 "`/setup-starboard-source` — Set source channel\n"
                 "`/setup-starboard-role <role>` — Set temp role (30 hari)\n"
                 "`/setup-starboard-threshold <count>` — Set min stars\n"
-                "`/leaderboard` — Top 10 starboard ranking"
+                "`/setup-mvp-channel` — Set channel notif MVP\n"
+                "`/setup-mvp-image <url>` — Set gambar MVP\n"
+                "`/leaderboard` — Ranking bulan ini + all time"
             ),
             inline=False,
         )

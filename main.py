@@ -133,6 +133,31 @@ async def on_member_join(member: discord.Member):
 
 
 @bot.event
+async def on_member_update(before: discord.Member, after: discord.Member):
+    # Deteksi boost baru: sebelumnya tidak boost, sekarang boost
+    if before.premium_since is None and after.premium_since is not None:
+        channel = bot.get_channel(bot.welcome_channel_id)
+        if not channel:
+            return
+
+        embed = discord.Embed(
+            description=(
+                f"## 🎉 Terima Kasih Sudah Boost!\n\n"
+                f"{after.mention} baru saja **boost** server! "
+                f"Makasih banyak atas dukungannya! 💜\n\n"
+                f"Semoga makin betah di **Celestial Server** ya! ✨"
+            ),
+            color=0xf47fff,
+        )
+        embed.set_thumbnail(url=after.display_avatar.url)
+        embed.set_image(url="https://media.tenor.com/ttqmTHRfjcgAAAAM/%E6%88%91%E5%9C%A8%E9%80%99%E8%A3%A1.gif")
+        embed.set_footer(text="✦ Celestial · Server Boost")
+
+        await channel.send(content=after.mention, embed=embed)
+        logger.info(f"[boost] {after} ({after.id}) boosted the server")
+
+
+@bot.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     rules_message_id = getattr(bot, "rules_message_id", RULES_MESSAGE_ID)
     logger.info(f"[reaction] msg={payload.message_id} emoji={payload.emoji} user={payload.user_id}")

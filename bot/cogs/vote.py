@@ -158,6 +158,20 @@ class PollRoleAssignSelect(discord.ui.UserSelect):
                 f"\u2705 Role {role.mention} diberikan ke {member.mention}.", ephemeral=True
             )
             logger.info(f"[vote] Role '{role.name}' assigned to {member} from poll #{self.poll_id}")
+
+            # Disable Assign Role button on poll message
+            poll = await get_poll(self.poll_id)
+            if poll:
+                ch = interaction.client.get_channel(int(poll["channel_id"]))
+                if ch:
+                    try:
+                        poll_msg = await ch.fetch_message(int(poll["message_id"]))
+                        view = discord.ui.View()
+                        view.add_item(discord.ui.Button(label="Closed", style=discord.ButtonStyle.secondary, disabled=True, emoji="🔒"))
+                        view.add_item(discord.ui.Button(label=f"Role → {member.display_name}", style=discord.ButtonStyle.secondary, disabled=True, emoji="✅"))
+                        await poll_msg.edit(view=view)
+                    except (discord.NotFound, discord.HTTPException):
+                        pass
         except discord.Forbidden:
             await interaction.followup.send("\u274c Bot tidak punya permission untuk assign role.", ephemeral=True)
         self.view.stop()

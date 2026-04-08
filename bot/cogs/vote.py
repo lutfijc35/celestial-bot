@@ -159,17 +159,26 @@ class PollRoleAssignSelect(discord.ui.UserSelect):
             )
             logger.info(f"[vote] Role '{role.name}' assigned to {member} from poll #{self.poll_id}")
 
-            # Disable Assign Role button on poll message
+            # Update embed + disable button on poll message
             poll = await get_poll(self.poll_id)
             if poll:
                 ch = interaction.client.get_channel(int(poll["channel_id"]))
                 if ch:
                     try:
                         poll_msg = await ch.fetch_message(int(poll["message_id"]))
+                        if poll_msg.embeds:
+                            embed = poll_msg.embeds[0]
+                            embed.add_field(
+                                name="🎁 Role Assigned",
+                                value=f"{role.mention} → {member.mention}",
+                                inline=False,
+                            )
+                        else:
+                            embed = None
                         view = discord.ui.View()
                         view.add_item(discord.ui.Button(label="Closed", style=discord.ButtonStyle.secondary, disabled=True, emoji="🔒"))
                         view.add_item(discord.ui.Button(label=f"Role → {member.display_name}", style=discord.ButtonStyle.secondary, disabled=True, emoji="✅"))
-                        await poll_msg.edit(view=view)
+                        await poll_msg.edit(embed=embed, view=view)
                     except (discord.NotFound, discord.HTTPException):
                         pass
         except discord.Forbidden:
@@ -236,7 +245,7 @@ class VoteModal(discord.ui.Modal, title="\U0001f4ca Buat Polling"):
         placeholder="Opsi A, Opsi B, Opsi C",
     )
     durasi = discord.ui.TextInput(
-        label="Durasi (opsional: 1h, 6h, 1d, 3d, 7d)",
+        label="Durasi (opsional: 1h, 6h, 1d, 3d, 7d, 30d)",
         required=False,
         max_length=10,
         placeholder="Kosongkan untuk manual close",
@@ -265,7 +274,7 @@ class VoteModal(discord.ui.Modal, title="\U0001f4ca Buat Polling"):
         if self.durasi.value.strip():
             delta = parse_duration(self.durasi.value)
             if not delta:
-                await interaction.followup.send("\u274c Format durasi salah. Gunakan: 1h, 6h, 1d, 3d, 7d", ephemeral=True)
+                await interaction.followup.send("\u274c Format durasi salah. Gunakan: 1h, 6h, 1d, 3d, 7d, 30d", ephemeral=True)
                 return
             expires_at = datetime.now(timezone.utc) + delta
             expires_at_str = expires_at.strftime("%Y-%m-%d %H:%M:%S")

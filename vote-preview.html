@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celestial Bot — Vote/Poll Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'gg sans', 'Noto Sans', Whitney, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #1e1f22;
+      color: #dcddde;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 32px 60px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: #949ba4;
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2b2d31;
+      margin: 40px 0;
+    }
+
+    .label {
+      font-size: 12px;
+      color: #949ba4;
+      margin-bottom: 10px;
+    }
+
+    /* ── Discord Message ── */
+    .message {
+      display: flex;
+      gap: 16px;
+      padding: 8px 16px;
+      margin-bottom: 24px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      background: #5865f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .msg-body { flex: 1; }
+
+    .msg-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .msg-author {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f2f3f5;
+    }
+
+    .msg-badge {
+      font-size: 10px;
+      font-weight: 600;
+      background: #5865f2;
+      color: #fff;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: #949ba4;
+    }
+
+    /* ── Embed ── */
+    .embed {
+      background: #2b2d31;
+      border-left: 4px solid #5865f2;
+      border-radius: 0 4px 4px 0;
+      padding: 16px 18px;
+      max-width: 520px;
+      margin-top: 4px;
+    }
+
+    .embed-gold { border-left-color: #ffd700; }
+    .embed-green { border-left-color: #3ba55c; }
+    .embed-grey { border-left-color: #4e5058; }
+
+    .embed-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 12px;
+    }
+
+    .embed-desc {
+      font-size: 13px;
+      color: #dcddde;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .embed-footer {
+      font-size: 11px;
+      color: #949ba4;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #3f4147;
+    }
+
+    /* ── Progress bars ── */
+    .poll-option {
+      margin-bottom: 8px;
+    }
+
+    .poll-option-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .poll-option-label { color: #f2f3f5; font-weight: 500; }
+    .poll-option-count { color: #949ba4; }
+
+    .poll-bar {
+      height: 18px;
+      background: #1e1f22;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .poll-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .poll-bar-pct {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: #f2f3f5;
+    }
+
+    .bar-blue { background: #5865f2; }
+    .bar-green { background: #3ba55c; }
+    .bar-yellow { background: #faa61a; }
+    .bar-red { background: #ed4245; }
+    .bar-purple { background: #9b59b6; }
+
+    .poll-total {
+      font-size: 12px;
+      color: #949ba4;
+      margin-top: 10px;
+    }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary { background: #5865f2; color: #fff; }
+    .btn-secondary { background: #4e5058; color: #dcddde; }
+    .btn-success { background: #3ba55c; color: #fff; }
+    .btn-disabled { background: #4e5058; color: #72767d; cursor: not-allowed; opacity: 0.6; }
+
+    /* ── Modal mockup ── */
+    .modal {
+      background: #313338;
+      border: 1px solid #1e1f22;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 460px;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f2f3f5;
+      margin-bottom: 16px;
+    }
+
+    .modal-field { margin-bottom: 14px; }
+    .modal-field:last-child { margin-bottom: 0; }
+
+    .modal-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #b5bac1;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .modal-label .req { color: #f23f43; }
+    .modal-label .opt { color: #949ba4; font-weight: 400; font-size: 10px; text-transform: none; }
+
+    .modal-input {
+      background: #1e1f22;
+      border: 1px solid #1e1f22;
+      border-radius: 3px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #dcddde;
+      width: 100%;
+    }
+
+    .modal-input.placeholder { color: #949ba4; font-style: italic; }
+
+    /* ── Flow steps ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 300px;
+      max-width: 440px;
+      width: 100%;
+      line-height: 1.5;
+    }
+
+    .node-sub { display: block; font-size: 11px; font-weight: 400; margin-top: 3px; opacity: 0.75; }
+    .node-admin { background: #3d3117; border: 1px solid #ffa500; color: #ffc966; }
+    .node-user { background: #3c4270; border: 1px solid #5865f2; color: #c9cdf7; }
+    .node-bot { background: #2e3d2e; border: 1px solid #3ba55c; color: #79cf8e; }
+    .node-end { background: #3d1a1a; border: 1px solid #ed4245; color: #f38183; }
+
+    .arrow { padding: 4px 0; color: #4e5058; font-size: 16px; text-align: center; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .page { padding: 24px 16px 40px; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="page-title">📊 Vote/Poll System — Celestial Bot</div>
+  <div class="page-subtitle">Preview tampilan polling: modal, embed, voting, results, dan role assign</div>
+
+  <hr class="divider">
+
+  <!-- ══════════ STEP 1: MODAL ══════════ -->
+  <div class="section-title">1️⃣ Admin buat poll — /vote</div>
+
+  <div class="modal">
+    <div class="modal-title">📊 Buat Polling</div>
+    <div class="modal-field">
+      <div class="modal-label">Judul <span class="req">*</span></div>
+      <div class="modal-input">Mau raid boss apa malam ini?</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Opsi (pisah koma) <span class="req">*</span></div>
+      <div class="modal-input">Azimanak, Banshee, Wyvern, Caides</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Durasi <span class="opt">(opsional: 1h, 6h, 1d, 3d, 7d)</span></div>
+      <div class="modal-input">6h</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Role Reward <span class="opt">(opsional, kosongkan jika tidak ada)</span></div>
+      <div class="modal-input placeholder">ID role atau kosongkan</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ STEP 2: ACTIVE POLL ══════════ -->
+  <div class="section-title">2️⃣ Poll aktif — user voting</div>
+
+  <div class="message">
+    <div class="avatar">C</div>
+    <div class="msg-body">
+      <div class="msg-header">
+        <span class="msg-author">Celestials</span>
+        <span class="msg-badge">APP</span>
+        <span class="msg-time">Today at 20:00</span>
+      </div>
+
+      <div class="embed embed-gold">
+        <div class="embed-title">📊 Mau raid boss apa malam ini?</div>
+
+        <div class="poll-option">
+          <div class="poll-option-header">
+            <span class="poll-option-label">1️⃣ Azimanak</span>
+            <span class="poll-option-count">5 votes</span>
+          </div>
+          <div class="poll-bar">
+            <div class="poll-bar-fill bar-blue" style="width:50%"></div>
+            <span class="poll-bar-pct">50%</span>
+          </div>
+        </div>
+
+        <div class="poll-option">
+          <div class="poll-option-header">
+            <span class="poll-option-label">2️⃣ Banshee</span>
+            <span class="poll-option-count">3 votes</span>
+          </div>
+          <div class="poll-bar">
+            <div class="poll-bar-fill bar-green" style="width:30%"></div>
+            <span class="poll-bar-pct">30%</span>
+          </div>
+        </div>
+
+        <div class="poll-option">
+          <div class="poll-option-header">
+            <span class="poll-option-label">3️⃣ Wyvern</span>
+            <span class="poll-option-count">2 votes</span>
+          </div>
+          <div class="poll-bar">
+            <div class="poll-bar-fill bar-yellow" style="width:20%"></div>
+            <span class="poll-bar-pct">20%</span>
+          </div>
+        </div>
+
+        <div class="poll-option">
+          <div class="poll-option-header">
+            <span class="poll-option-label">4️⃣ Caides</span>
+            <span class="poll-option-count">0 votes</span>
+          </div>
+          <div class="poll-bar">
+            <div class="poll-bar-fill bar-red" style="width:0%"></div>
+            <span class="poll-bar-pct">0%</span>
+          </div>
+        </div>
+
+        <div class="poll-total">Total: 10 votes · Berakhir <strong>dalam 5 jam</strong></div>
+        <div class="embed-footer">Poll ID: 1</div>
+      </div>
+
+      <div class="btn-row">
+        <div class="btn btn-primary">1️⃣ Azimanak</div>
+        <div class="btn btn-primary">2️⃣ Banshee</div>
+        <div class="btn btn-primary">3️⃣ Wyvern</div>
+        <div class="btn btn-primary">4️⃣ Caides</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ STEP 3: CLOSED ══════════ -->
+  <div class="section-title">3️⃣ Poll ditutup — results final</div>
+
+  <div class="two-col">
+    <div>
+      <div class="label">Poll closed (button disabled):</div>
+      <div class="message" style="padding:0">
+        <div class="msg-body">
+          <div class="embed embed-grey">
+            <div class="embed-title">📊 Mau raid boss apa malam ini? — Closed</div>
+
+            <div class="poll-option">
+              <div class="poll-option-header">
+                <span class="poll-option-label">1️⃣ Azimanak 🏆</span>
+                <span class="poll-option-count">5 votes</span>
+              </div>
+              <div class="poll-bar">
+                <div class="poll-bar-fill bar-blue" style="width:50%"></div>
+                <span class="poll-bar-pct">50%</span>
+              </div>
+            </div>
+
+            <div class="poll-option">
+              <div class="poll-option-header">
+                <span class="poll-option-label">2️⃣ Banshee</span>
+                <span class="poll-option-count">3 votes</span>
+              </div>
+              <div class="poll-bar">
+                <div class="poll-bar-fill bar-green" style="width:30%"></div>
+                <span class="poll-bar-pct">30%</span>
+              </div>
+            </div>
+
+            <div class="poll-option">
+              <div class="poll-option-header">
+                <span class="poll-option-label">3️⃣ Wyvern</span>
+                <span class="poll-option-count">2 votes</span>
+              </div>
+              <div class="poll-bar">
+                <div class="poll-bar-fill bar-yellow" style="width:20%"></div>
+                <span class="poll-bar-pct">20%</span>
+              </div>
+            </div>
+
+            <div class="poll-total">Total: 10 votes · Poll selesai</div>
+            <div class="embed-footer">Poll ID: 1 · Closed by Piaro</div>
+          </div>
+
+          <div class="btn-row">
+            <div class="btn btn-disabled">🔒 Closed</div>
+            <div class="btn btn-success">🎁 Assign Role</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="label">Setelah admin assign role:</div>
+      <div class="message" style="padding:0">
+        <div class="msg-body">
+          <div class="embed embed-green">
+            <div class="embed-title">🎁 Role Assigned</div>
+            <div class="embed-desc">
+              Role <span style="color:#5865f2">@Raid Leader</span> telah diberikan ke <span style="color:#7289da">@Dys</span>
+            </div>
+            <div class="embed-footer">Berdasarkan hasil Poll #1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════ FLOW ══════════ -->
+  <div class="section-title">📋 Alur Lengkap</div>
+
+  <div class="flow">
+    <div class="node node-admin">
+      👑 Admin ketik <strong>/vote</strong>
+      <span class="node-sub">Modal: judul, opsi, durasi, role reward</span>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node node-bot">
+      🤖 Bot post embed poll + button per opsi
+      <span class="node-sub">Max 5 opsi, progress bar live</span>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node node-user">
+      👤 User klik button untuk vote
+      <span class="node-sub">1 vote per user, bisa ganti pilihan</span>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node node-admin">
+      👑 Pembuat/admin ketik <strong>/close-vote</strong>
+      <span class="node-sub">Atau auto-close saat durasi habis</span>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node node-bot">
+      📊 Results final + button disabled
+      <span class="node-sub">Pemenang ditandai 🏆</span>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node node-admin">
+      🎁 Admin klik "Assign Role" (opsional)
+      <span class="node-sub">Pilih member → role di-assign</span>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#4e5058;font-size:11px;margin-top:40px">
+    Celestial Bot · Vote/Poll System · 2026
+  </div>
+
+</div>
+
+</body>
+</html>

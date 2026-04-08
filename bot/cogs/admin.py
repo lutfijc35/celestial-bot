@@ -759,6 +759,14 @@ class AdminCog(commands.Cog):
             inline=False,
         )
         embed.add_field(
+            name="📊 Voting",
+            value=(
+                "`/vote` — Buat polling baru\n"
+                "`/close-vote` — Tutup polling aktif"
+            ),
+            inline=False,
+        )
+        embed.add_field(
             name="📋 Waifu Logger",
             value=(
                 "`/setup-waifu-log` — Set/unset channel logger\n"

@@ -95,6 +95,32 @@ async def init_db():
                 assigned_at      DATETIME,
                 closed_at        DATETIME
             );
+
+            CREATE TABLE IF NOT EXISTS polls (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                creator_id   TEXT NOT NULL,
+                title        TEXT NOT NULL,
+                message_id   TEXT NOT NULL,
+                channel_id   TEXT NOT NULL,
+                status       TEXT NOT NULL DEFAULT 'open',
+                role_id      TEXT,
+                expires_at   DATETIME,
+                created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS poll_options (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                poll_id    INTEGER NOT NULL REFERENCES polls(id),
+                label      TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS poll_votes (
+                poll_id    INTEGER NOT NULL,
+                option_id  INTEGER NOT NULL,
+                voter_id   TEXT NOT NULL,
+                voted_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(poll_id, voter_id)
+            );
         """)
         await db.commit()
 
@@ -586,3 +612,98 @@ async def update_task_closed(task_id: int):
             (task_id,)
         )
         await db.commit()
+
+
+# ── Polls ─────────────────────────────────────────────────────────
+
+async def create_poll(creator_id: str, title: str, message_id: str, channel_id: str, role_id: str | None, expires_at: str | None) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """INSERT INTO polls (creator_id, title, message_id, channel_id, role_id, expires_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (creator_id, title, message_id, channel_id, role_id, expires_at)
+        ) as cur:
+            poll_id = cur.lastrowid
+        await db.commit()
+        return poll_id
+
+
+async def add_poll_option(poll_id: int, label: str) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "INSERT INTO poll_options (poll_id, label) VALUES (?, ?)",
+            (poll_id, label)
+        ) as cur:
+            option_id = cur.lastrowid
+        await db.commit()
+        return option_id
+
+
+async def get_poll(poll_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute("SELECT * FROM polls WHERE id = ?", (poll_id,)) as cur:
+            return await cur.fetchone()
+
+
+async def get_poll_options(poll_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM poll_options WHERE poll_id = ? ORDER BY id", (poll_id,)
+        ) as cur:
+            return await cur.fetchall()
+
+
+async def upsert_vote(poll_id: int, option_id: int, voter_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """INSERT INTO poll_votes (poll_id, option_id, voter_id)
+               VALUES (?, ?, ?)
+               ON CONFLICT(poll_id, voter_id) DO UPDATE SET option_id = excluded.option_id, voted_at = CURRENT_TIMESTAMP""",
+            (poll_id, option_id, voter_id)
+        )
+        await db.commit()
+
+
+async def get_poll_results(poll_id: int):
+    """Return list of (option_id, label, vote_count) ordered by option id."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT po.id, po.label, COUNT(pv.voter_id) as votes
+               FROM poll_options po
+               LEFT JOIN poll_votes pv ON po.id = pv.option_id AND pv.poll_id = po.poll_id
+               WHERE po.poll_id = ?
+               GROUP BY po.id
+               ORDER BY po.id""",
+            (poll_id,)
+        ) as cur:
+            return await cur.fetchall()
+
+
+async def get_voters_for_option(option_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "SELECT voter_id FROM poll_votes WHERE option_id = ?", (option_id,)
+        ) as cur:
+            rows = await cur.fetchall()
+            return [row[0] for row in rows]
+
+
+async def close_poll(poll_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE polls SET status = 'closed' WHERE id = ?", (poll_id,)
+        )
+        await db.commit()
+
+
+async def get_expired_polls():
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT * FROM polls
+               WHERE status = 'open' AND expires_at IS NOT NULL
+               AND expires_at <= datetime('now')"""
+        ) as cur:
+            return await cur.fetchall()

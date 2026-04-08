@@ -18,6 +18,7 @@ from bot.cogs.profile import ProfileCog
 from bot.cogs.starboard import StarboardCog
 from bot.cogs.waifu_logger import WaifuLoggerCog
 from bot.cogs.promote import PromoteCog, TaskInterestButton, TaskAssignView
+from bot.cogs.vote import VoteCog, VoteButtonView, PollClosedView
 
 logging.basicConfig(
     level=logging.INFO,
@@ -80,12 +81,16 @@ async def on_ready():
     await bot.add_cog(StarboardCog(bot))
     await bot.add_cog(WaifuLoggerCog(bot))
     await bot.add_cog(PromoteCog(bot))
+    await bot.add_cog(VoteCog(bot))
 
     # Re-register persistent views (agar button tetap berfungsi setelah restart)
     bot.add_view(ApprovalView())
     bot.add_view(RegisterButton())
     bot.add_view(TaskInterestButton())
     bot.add_view(TaskAssignView())
+    bot.add_view(VoteButtonView())
+    bot.add_view(PollClosedView(has_role=False))
+    bot.add_view(PollClosedView(has_role=True))
 
     # Sync slash commands ke guild
     guild = discord.Object(id=GUILD_ID)

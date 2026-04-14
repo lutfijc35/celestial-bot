@@ -101,7 +101,10 @@ class RedeemCodeModal(discord.ui.Modal, title="🎟️ Redeem Code"):
         )
         embed.set_footer(text=f"Total: {len(codes)} kode · Long-press kode untuk copy")
 
-        new_msg = await channel.send(embed=embed)
+        role_id = await get_setting("redeem_role_id")
+        content = f"<@&{role_id}>" if role_id else None
+
+        new_msg = await channel.send(content=content, embed=embed)
         await set_setting("redeem_message_id", str(new_msg.id))
 
         await interaction.followup.send(
@@ -748,19 +751,27 @@ class AdminCog(commands.Cog):
     async def redeem_code(self, interaction: discord.Interaction):
         await interaction.response.send_modal(RedeemCodeModal())
 
-    @app_commands.command(name="setup-redeem-channel", description="[Admin] Set/unset channel untuk redeem code")
+    @app_commands.command(name="setup-redeem-channel", description="[Admin] Set/unset channel redeem (role opsional untuk ping)")
     @app_commands.default_permissions(manage_channels=True)
-    async def setup_redeem_channel(self, interaction: discord.Interaction):
+    async def setup_redeem_channel(self, interaction: discord.Interaction, role: discord.Role = None):
         await interaction.response.defer(ephemeral=True)
         current = await get_setting("redeem_channel_id")
         if current and int(current) == interaction.channel.id:
             await delete_setting("redeem_channel_id")
             await delete_setting("redeem_message_id")
+            await delete_setting("redeem_role_id")
             await interaction.followup.send("❌ Channel redeem dinonaktifkan.", ephemeral=True)
         else:
             await set_setting("redeem_channel_id", str(interaction.channel.id))
+            if role:
+                await set_setting("redeem_role_id", str(role.id))
+                role_info = f"\nRole ping: {role.mention}"
+            else:
+                await delete_setting("redeem_role_id")
+                role_info = "\nRole ping: — (tidak ada)"
             await interaction.followup.send(
-                f"✅ Channel redeem diset ke <#{interaction.channel.id}>.", ephemeral=True
+                f"✅ Channel redeem diset ke <#{interaction.channel.id}>.{role_info}",
+                ephemeral=True,
             )
 
     @app_commands.command(name="help", description="Lihat daftar semua command bot")

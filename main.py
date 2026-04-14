@@ -19,6 +19,7 @@ from bot.cogs.starboard import StarboardCog
 from bot.cogs.waifu_logger import WaifuLoggerCog
 from bot.cogs.promote import PromoteCog, TaskInterestButton, TaskAssignView
 from bot.cogs.vote import VoteCog, VoteButtonView, PollClosedView
+from bot.cogs.chat_trigger import ChatTriggerCog
 
 logging.basicConfig(
     level=logging.INFO,
@@ -82,6 +83,7 @@ async def on_ready():
     await bot.add_cog(WaifuLoggerCog(bot))
     await bot.add_cog(PromoteCog(bot))
     await bot.add_cog(VoteCog(bot))
+    await bot.add_cog(ChatTriggerCog(bot))
 
     # Re-register persistent views (agar button tetap berfungsi setelah restart)
     bot.add_view(ApprovalView())

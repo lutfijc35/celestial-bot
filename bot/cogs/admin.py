@@ -51,6 +51,65 @@ class AnnounceModal(discord.ui.Modal, title="📢 Buat Pengumuman"):
         await interaction.response.send_message("✅ Pengumuman berhasil di-post.", ephemeral=True)
 
 
+class RedeemCodeModal(discord.ui.Modal, title="🎟️ Redeem Code"):
+    kode = discord.ui.TextInput(
+        label="Redeem Code (pisah koma)",
+        style=discord.TextStyle.paragraph,
+        required=True,
+        max_length=2000,
+        placeholder="Contoh: 1hjh, 34hkh, 6j5hk",
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
+        ch_id = await get_setting("redeem_channel_id")
+        if not ch_id:
+            await interaction.followup.send(
+                "❌ Channel redeem belum diset. Gunakan `/setup-redeem-channel`.",
+                ephemeral=True,
+            )
+            return
+
+        channel = interaction.client.get_channel(int(ch_id))
+        if not channel:
+            await interaction.followup.send(
+                "❌ Channel redeem tidak ditemukan.", ephemeral=True
+            )
+            return
+
+        codes = [c.strip() for c in self.kode.value.split(",") if c.strip()]
+        if not codes:
+            await interaction.followup.send("❌ Kode tidak valid.", ephemeral=True)
+            return
+
+        # Hapus pesan redeem lama jika ada
+        old_msg_id = await get_setting("redeem_message_id")
+        if old_msg_id:
+            try:
+                old_msg = await channel.fetch_message(int(old_msg_id))
+                await old_msg.delete()
+            except (discord.NotFound, discord.HTTPException):
+                pass
+
+        # Post pesan baru
+        lines = [f"{i+1}. `{code}`" for i, code in enumerate(codes)]
+        embed = discord.Embed(
+            title="🎟️ Redeem Code",
+            description="\n".join(lines),
+            color=0xffd700,
+        )
+        embed.set_footer(text=f"Total: {len(codes)} kode · Long-press kode untuk copy")
+
+        new_msg = await channel.send(embed=embed)
+        await set_setting("redeem_message_id", str(new_msg.id))
+
+        await interaction.followup.send(
+            f"✅ {len(codes)} kode berhasil di-post ke <#{int(ch_id)}>.",
+            ephemeral=True,
+        )
+
+
 class GuildInfoModal(discord.ui.Modal, title="✦ Set Info Guild"):
     def __init__(self, guild_name: str, tipe: str, current):
         super().__init__()
@@ -684,6 +743,26 @@ class AdminCog(commands.Cog):
     async def announce(self, interaction: discord.Interaction):
         await interaction.response.send_modal(AnnounceModal())
 
+    @app_commands.command(name="redeem-code", description="[Admin] Post daftar redeem code (replace pesan lama)")
+    @app_commands.default_permissions(manage_channels=True)
+    async def redeem_code(self, interaction: discord.Interaction):
+        await interaction.response.send_modal(RedeemCodeModal())
+
+    @app_commands.command(name="setup-redeem-channel", description="[Admin] Set/unset channel untuk redeem code")
+    @app_commands.default_permissions(manage_channels=True)
+    async def setup_redeem_channel(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        current = await get_setting("redeem_channel_id")
+        if current and int(current) == interaction.channel.id:
+            await delete_setting("redeem_channel_id")
+            await delete_setting("redeem_message_id")
+            await interaction.followup.send("❌ Channel redeem dinonaktifkan.", ephemeral=True)
+        else:
+            await set_setting("redeem_channel_id", str(interaction.channel.id))
+            await interaction.followup.send(
+                f"✅ Channel redeem diset ke <#{interaction.channel.id}>.", ephemeral=True
+            )
+
     @app_commands.command(name="help", description="Lihat daftar semua command bot")
     async def help_command(self, interaction: discord.Interaction):
         embed = discord.Embed(title="✦ Celestial Bot — Command List", color=0x5865f2)
@@ -763,6 +842,23 @@ class AdminCog(commands.Cog):
             value=(
                 "`/vote` — Buat polling baru\n"
                 "`/close-vote` — Tutup polling aktif"
+            ),
+            inline=False,
+        )
+        embed.add_field(
+            name="🎟️ Redeem Code",
+            value=(
+                "`/redeem-code` — Post daftar redeem code\n"
+                "`/setup-redeem-channel` — Set channel redeem"
+            ),
+            inline=False,
+        )
+        embed.add_field(
+            name="💬 Chat Trigger",
+            value=(
+                "`/add-trigger` — Tambah auto-response (regex)\n"
+                "`/list-triggers` — Lihat semua trigger\n"
+                "`/remove-trigger <id>` — Hapus trigger"
             ),
             inline=False,
         )

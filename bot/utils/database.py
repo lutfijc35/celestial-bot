@@ -72,6 +72,16 @@ async def init_db():
                 created_at           DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS chat_triggers (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                pattern        TEXT NOT NULL,
+                response_text  TEXT,
+                image_url      TEXT,
+                channel_id     TEXT,
+                created_by     TEXT NOT NULL,
+                created_at     DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS starboard_mvp_notified (
                 author_discord_id TEXT NOT NULL,
                 year              INTEGER NOT NULL,
@@ -707,3 +717,36 @@ async def get_expired_polls():
                AND expires_at <= datetime('now')"""
         ) as cur:
             return await cur.fetchall()
+
+
+# ── Chat Triggers ─────────────────────────────────────────────────
+
+async def add_chat_trigger(pattern: str, response_text: str | None, image_url: str | None, channel_id: str | None, created_by: str) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """INSERT INTO chat_triggers (pattern, response_text, image_url, channel_id, created_by)
+               VALUES (?, ?, ?, ?, ?)""",
+            (pattern, response_text, image_url, channel_id, created_by)
+        ) as cur:
+            trigger_id = cur.lastrowid
+        await db.commit()
+        return trigger_id
+
+
+async def get_all_chat_triggers():
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM chat_triggers ORDER BY id"
+        ) as cur:
+            return await cur.fetchall()
+
+
+async def delete_chat_trigger(trigger_id: int) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "DELETE FROM chat_triggers WHERE id = ?", (trigger_id,)
+        ) as cur:
+            affected = cur.rowcount
+        await db.commit()
+        return affected

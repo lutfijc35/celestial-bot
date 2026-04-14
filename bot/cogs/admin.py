@@ -751,28 +751,50 @@ class AdminCog(commands.Cog):
     async def redeem_code(self, interaction: discord.Interaction):
         await interaction.response.send_modal(RedeemCodeModal())
 
-    @app_commands.command(name="setup-redeem-channel", description="[Admin] Set/unset channel redeem (role opsional untuk ping)")
+    @app_commands.command(name="setup-redeem-channel", description="[Admin] Set channel redeem (parameter role & unset opsional)")
     @app_commands.default_permissions(manage_channels=True)
-    async def setup_redeem_channel(self, interaction: discord.Interaction, role: discord.Role = None):
+    @app_commands.describe(
+        role="Role yang di-ping saat post redeem (opsional)",
+        unset="Nonaktifkan channel redeem (set True untuk unset)",
+    )
+    async def setup_redeem_channel(
+        self,
+        interaction: discord.Interaction,
+        role: discord.Role = None,
+        unset: bool = False,
+    ):
         await interaction.response.defer(ephemeral=True)
-        current = await get_setting("redeem_channel_id")
-        if current and int(current) == interaction.channel.id:
+
+        # Unset mode — nonaktifkan semua
+        if unset:
             await delete_setting("redeem_channel_id")
             await delete_setting("redeem_message_id")
             await delete_setting("redeem_role_id")
             await interaction.followup.send("❌ Channel redeem dinonaktifkan.", ephemeral=True)
-        else:
+            return
+
+        current = await get_setting("redeem_channel_id")
+        same_channel = current and int(current) == interaction.channel.id
+
+        if not same_channel:
+            # Channel baru (atau belum ada) — set channel
             await set_setting("redeem_channel_id", str(interaction.channel.id))
-            if role:
-                await set_setting("redeem_role_id", str(role.id))
-                role_info = f"\nRole ping: {role.mention}"
-            else:
-                await delete_setting("redeem_role_id")
-                role_info = "\nRole ping: — (tidak ada)"
-            await interaction.followup.send(
-                f"✅ Channel redeem diset ke <#{interaction.channel.id}>.{role_info}",
-                ephemeral=True,
-            )
+            # Reset message_id karena channel berubah
+            await delete_setting("redeem_message_id")
+
+        # Update role (baik channel baru atau channel sama)
+        if role:
+            await set_setting("redeem_role_id", str(role.id))
+            role_info = f"\nRole ping: {role.mention}"
+        else:
+            await delete_setting("redeem_role_id")
+            role_info = "\nRole ping: — (tidak ada)"
+
+        action = "di-update" if same_channel else "diset"
+        await interaction.followup.send(
+            f"✅ Channel redeem {action} ke <#{interaction.channel.id}>.{role_info}",
+            ephemeral=True,
+        )
 
     @app_commands.command(name="help", description="Lihat daftar semua command bot")
     async def help_command(self, interaction: discord.Interaction):

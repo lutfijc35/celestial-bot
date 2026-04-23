@@ -903,6 +903,17 @@ class AdminCog(commands.Cog):
             ),
             inline=False,
         )
+        embed.add_field(
+            name="🎨 Sticker Voting",
+            value=(
+                "`/submit-sticker <file> <nama> <tag>` — Submit sticker (member, cooldown 1 hari)\n"
+                "`/poll-sticker-keep <sticker>` — Retention poll keep/remove\n"
+                "`/setup-sticker-channel` — Toggle channel voting\n"
+                "`/setup-sticker-admin-role <role>` — Set role approver\n"
+                "`/list-sticker-polls` — Lihat semua poll aktif"
+            ),
+            inline=False,
+        )
         embed.set_footer(text="<wajib> · [opsional] · Admin commands perlu permission khusus")
 
         await interaction.response.send_message(embed=embed, ephemeral=True)

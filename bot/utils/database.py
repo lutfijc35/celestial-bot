@@ -131,6 +131,30 @@ async def init_db():
                 voted_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(poll_id, voter_id)
             );
+
+            CREATE TABLE IF NOT EXISTS sticker_polls (
+                id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+                poll_type          TEXT NOT NULL,
+                initiator_id       TEXT NOT NULL,
+                sticker_name       TEXT NOT NULL,
+                sticker_tag        TEXT,
+                image_url          TEXT,
+                discord_sticker_id TEXT,
+                message_id         TEXT NOT NULL,
+                channel_id         TEXT NOT NULL,
+                status             TEXT NOT NULL DEFAULT 'voting',
+                expires_at         DATETIME NOT NULL,
+                created_at         DATETIME DEFAULT CURRENT_TIMESTAMP,
+                closed_at          DATETIME
+            );
+
+            CREATE TABLE IF NOT EXISTS sticker_votes (
+                poll_id    INTEGER NOT NULL,
+                voter_id   TEXT NOT NULL,
+                vote_type  TEXT NOT NULL,
+                voted_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(poll_id, voter_id)
+            );
         """)
         await db.commit()
 
@@ -750,3 +774,173 @@ async def delete_chat_trigger(trigger_id: int) -> int:
             affected = cur.rowcount
         await db.commit()
         return affected
+
+
+# ── Sticker Polls ─────────────────────────────────────────────────
+
+async def create_sticker_poll(
+    poll_type: str,
+    initiator_id: str,
+    sticker_name: str,
+    sticker_tag: str | None,
+    image_url: str | None,
+    discord_sticker_id: str | None,
+    message_id: str,
+    channel_id: str,
+    expires_at: str,
+) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """INSERT INTO sticker_polls
+               (poll_type, initiator_id, sticker_name, sticker_tag, image_url,
+                discord_sticker_id, message_id, channel_id, expires_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (poll_type, initiator_id, sticker_name, sticker_tag, image_url,
+             discord_sticker_id, message_id, channel_id, expires_at)
+        ) as cur:
+            poll_id = cur.lastrowid
+        await db.commit()
+        return poll_id
+
+
+async def get_sticker_poll(poll_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM sticker_polls WHERE id = ?", (poll_id,)
+        ) as cur:
+            return await cur.fetchone()
+
+
+async def get_sticker_poll_by_message(message_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM sticker_polls WHERE message_id = ?", (message_id,)
+        ) as cur:
+            return await cur.fetchone()
+
+
+async def upsert_sticker_vote(poll_id: int, voter_id: str, vote_type: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """INSERT INTO sticker_votes (poll_id, voter_id, vote_type)
+               VALUES (?, ?, ?)
+               ON CONFLICT(poll_id, voter_id) DO UPDATE SET
+                   vote_type = excluded.vote_type,
+                   voted_at = CURRENT_TIMESTAMP""",
+            (poll_id, voter_id, vote_type)
+        )
+        await db.commit()
+
+
+async def delete_sticker_vote(poll_id: int, voter_id: str) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "DELETE FROM sticker_votes WHERE poll_id = ? AND voter_id = ?",
+            (poll_id, voter_id)
+        ) as cur:
+            affected = cur.rowcount
+        await db.commit()
+        return affected
+
+
+async def get_sticker_vote(poll_id: int, voter_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            "SELECT vote_type FROM sticker_votes WHERE poll_id = ? AND voter_id = ?",
+            (poll_id, voter_id)
+        ) as cur:
+            row = await cur.fetchone()
+            return row[0] if row else None
+
+
+async def get_sticker_vote_counts(poll_id: int, type_a: str, type_b: str) -> tuple[int, int]:
+    """Return (count_a, count_b) for the two vote types."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(
+            """SELECT vote_type, COUNT(*) FROM sticker_votes
+               WHERE poll_id = ? GROUP BY vote_type""",
+            (poll_id,)
+        ) as cur:
+            rows = await cur.fetchall()
+    counts = {r[0]: r[1] for r in rows}
+    return counts.get(type_a, 0), counts.get(type_b, 0)
+
+
+async def get_last_sticker_submission_by_user(user_id: str):
+    """Return most recent submit poll (any status) by this user, for cooldown check."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT * FROM sticker_polls
+               WHERE poll_type = 'submit' AND initiator_id = ?
+               ORDER BY created_at DESC LIMIT 1""",
+            (user_id,)
+        ) as cur:
+            return await cur.fetchone()
+
+
+async def get_active_retention_poll_for_sticker(discord_sticker_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT * FROM sticker_polls
+               WHERE poll_type = 'retention'
+                 AND discord_sticker_id = ?
+                 AND status IN ('voting', 'pending_removal')
+               LIMIT 1""",
+            (discord_sticker_id,)
+        ) as cur:
+            return await cur.fetchone()
+
+
+async def close_sticker_poll(poll_id: int, status: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """UPDATE sticker_polls
+               SET status = ?, closed_at = CURRENT_TIMESTAMP
+               WHERE id = ?""",
+            (status, poll_id)
+        )
+        await db.commit()
+
+
+async def set_sticker_poll_status(poll_id: int, status: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE sticker_polls SET status = ? WHERE id = ?",
+            (status, poll_id)
+        )
+        await db.commit()
+
+
+async def set_sticker_discord_id(poll_id: int, discord_sticker_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE sticker_polls SET discord_sticker_id = ? WHERE id = ?",
+            (discord_sticker_id, poll_id)
+        )
+        await db.commit()
+
+
+async def get_expired_sticker_polls():
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT * FROM sticker_polls
+               WHERE status = 'voting' AND expires_at <= datetime('now')"""
+        ) as cur:
+            return await cur.fetchall()
+
+
+async def get_active_sticker_polls():
+    """For /list-sticker-polls — all non-final states."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT * FROM sticker_polls
+               WHERE status IN ('voting', 'pending_approval', 'pending_removal')
+               ORDER BY id DESC"""
+        ) as cur:
+            return await cur.fetchall()

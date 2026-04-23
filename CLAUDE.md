@@ -92,6 +92,16 @@ celestial/
 | `/setup-starboard-threshold <count>` | Set minimum bintang untuk masuk starboard (default: 5) |
 | `/leaderboard` | Top 10 user dengan pesan paling banyak di starboard |
 
+### Sticker Voting Commands
+
+| Command | Deskripsi |
+|---|---|
+| `/submit-sticker <file> <nama> <tag>` | Submit sticker baru (semua member, cooldown 1 hari, max 512KB) |
+| `/poll-sticker-keep <sticker>` | Admin trigger retention poll keep/remove untuk sticker existing |
+| `/setup-sticker-channel` | Toggle channel ini sebagai tempat voting sticker |
+| `/setup-sticker-admin-role <@role>` | Set role yang bisa approve/reject submit & confirm/cancel retention |
+| `/list-sticker-polls` | Lihat semua sticker poll aktif (submit + retention) |
+
 ## Events (Bot Listeners)
 
 | Event | Deskripsi |

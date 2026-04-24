@@ -148,6 +148,8 @@ def build_retention_embed(poll: dict, keep: int, remove: int, state: str = "voti
     embed.description = (
         f"Di-trigger oleh <@{poll['initiator_id']}> · Masih mau dipertahankan?"
     )
+    if poll.get("image_url"):
+        embed.set_image(url=poll["image_url"])
 
     total = keep + remove
     keep_pct = (keep / total * 100) if total > 0 else 0
@@ -796,8 +798,8 @@ class StickerVoteCog(commands.Cog):
             "sticker_tag": str(guild_sticker.emoji) if guild_sticker.emoji else None,
             "expires_at": expires_str,
         }
+        poll_stub["image_url"] = guild_sticker.url
         initial_embed = build_retention_embed(poll_stub, 0, 0, state="voting")
-        initial_embed.set_image(url=guild_sticker.url)
         view = StickerRetentionVoteView()
 
         msg = await channel.send(embed=initial_embed, view=view)
@@ -816,7 +818,6 @@ class StickerVoteCog(commands.Cog):
 
         poll = await get_sticker_poll(poll_id)
         embed = build_retention_embed(dict(poll), 0, 0, state="voting")
-        embed.set_image(url=guild_sticker.url)
         try:
             await msg.edit(embed=embed, view=view)
         except discord.HTTPException:

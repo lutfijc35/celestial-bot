@@ -20,7 +20,7 @@ from config import GUILD_ID
 
 logger = logging.getLogger("celestial")
 
-VOTE_DURATION = timedelta(days=7)
+VOTE_DURATION = timedelta(days=3)
 COOLDOWN = timedelta(days=1)
 MAX_FILE_SIZE = 512 * 1024
 THRESHOLD_NET = 5
@@ -725,7 +725,7 @@ class StickerVoteCog(commands.Cog):
             pass
 
         await interaction.followup.send(
-            f"✅ Sticker **{nama}** sudah di-submit! Voting dibuka selama 7 hari di {channel.mention}.",
+            f"✅ Sticker **{nama}** sudah di-submit! Voting dibuka selama {VOTE_DURATION.days} hari di {channel.mention}.",
             ephemeral=True,
         )
         logger.info(f"[sticker] Submit poll #{poll_id} created by {interaction.user}: '{nama}'")
@@ -824,7 +824,7 @@ class StickerVoteCog(commands.Cog):
             pass
 
         await interaction.followup.send(
-            f"✅ Retention poll untuk **{guild_sticker.name}** dibuka di {channel.mention} (7 hari).",
+            f"✅ Retention poll untuk **{guild_sticker.name}** dibuka di {channel.mention} ({VOTE_DURATION.days} hari).",
             ephemeral=True,
         )
         logger.info(f"[sticker] Retention poll #{poll_id} created by {interaction.user} for sticker {sticker_id_int}")
@@ -896,3 +896,48 @@ class StickerVoteCog(commands.Cog):
 
         embed.set_footer(text=f"Total: {len(polls)} poll")
         await interaction.followup.send(embed=embed, ephemeral=True)
+
+    # ── /close-sticker-poll ───────────────────────────────────────
+
+    @app_commands.command(name="close-sticker-poll", description="[Admin] Tutup sticker poll sekarang (evaluate state saat ini)")
+    @app_commands.default_permissions(manage_emojis_and_stickers=True)
+    @app_commands.describe(poll_id="ID poll yang mau ditutup")
+    async def close_sticker_poll_cmd(self, interaction: discord.Interaction, poll_id: int):
+        await interaction.response.defer(ephemeral=True)
+
+        if not await _is_sticker_admin(interaction):
+            await interaction.followup.send("❌ Kamu tidak punya permission.", ephemeral=True)
+            return
+
+        poll = await get_sticker_poll(poll_id)
+        if not poll:
+            await interaction.followup.send(f"❌ Poll #{poll_id} tidak ditemukan.", ephemeral=True)
+            return
+        if poll["status"] != "voting":
+            await interaction.followup.send(
+                f"⚠️ Poll #{poll_id} tidak sedang voting (status: `{poll['status']}`).",
+                ephemeral=True,
+            )
+            return
+
+        await self._auto_close(dict(poll))
+
+        poll = await get_sticker_poll(poll_id)
+        await interaction.followup.send(
+            f"✅ Poll #{poll_id} ditutup. Status sekarang: `{poll['status']}`.",
+            ephemeral=True,
+        )
+        logger.info(f"[sticker] Poll #{poll_id} manually closed by {interaction.user}")
+
+    @close_sticker_poll_cmd.autocomplete("poll_id")
+    async def _close_poll_autocomplete(self, interaction: discord.Interaction, current: str):
+        polls = await get_active_sticker_polls()
+        current_lower = current.lower()
+        choices = []
+        for p in polls:
+            if p["status"] != "voting":
+                continue
+            label = f"#{p['id']} {p['poll_type']} · {p['sticker_name']}"[:100]
+            if current_lower in label.lower() or current_lower == str(p["id"]):
+                choices.append(app_commands.Choice(name=label, value=p["id"]))
+        return choices[:25]

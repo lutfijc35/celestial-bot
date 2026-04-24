@@ -910,7 +910,8 @@ class AdminCog(commands.Cog):
                 "`/poll-sticker-keep <sticker>` — Retention poll keep/remove\n"
                 "`/setup-sticker-channel` — Toggle channel voting\n"
                 "`/setup-sticker-admin-role <role>` — Set role approver\n"
-                "`/list-sticker-polls` — Lihat semua poll aktif"
+                "`/list-sticker-polls` — Lihat semua poll aktif\n"
+                "`/close-sticker-poll <id>` — Tutup poll sekarang (skip deadline)"
             ),
             inline=False,
         )

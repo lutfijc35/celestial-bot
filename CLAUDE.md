@@ -101,6 +101,7 @@ celestial/
 | `/setup-sticker-channel` | Toggle channel ini sebagai tempat voting sticker |
 | `/setup-sticker-admin-role <@role>` | Set role yang bisa approve/reject submit & confirm/cancel retention |
 | `/list-sticker-polls` | Lihat semua sticker poll aktif (submit + retention) |
+| `/close-sticker-poll <id>` | Admin paksa tutup poll sekarang (evaluate state saat ini, skip deadline) |
 
 ## Events (Bot Listeners)
 
